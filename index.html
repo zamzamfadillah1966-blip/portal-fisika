@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Portal Pembelajaran & Lab Virtual Fisika</title>
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#14213d;--mut:#5b6784;--pri:#1d4ed8;--acc:#f59e0b;--line:#dbe3f0;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0d1424;--card:#16203a;--ink:#e8eefc;--mut:#9aa8c9;--pri:#6c9bff;--line:#27345a}}
+:root[data-theme="dark"]{--bg:#0d1424;--card:#16203a;--ink:#e8eefc;--mut:#9aa8c9;--pri:#6c9bff;--line:#27345a}
+html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+header{background:linear-gradient(135deg,#1e3a8a,#2563eb 60%,#0ea5e9);color:#fff;padding:28px 16px 22px}
+.wrap{max-width:1100px;margin:0 auto;padding:0 16px}
+header .wrap{padding:0}
+h1{margin:0 0 6px;font-size:clamp(1.4rem,4vw,2.1rem)}
+header p{margin:0 0 12px;opacity:.92}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);padding:4px 12px;border-radius:99px;font-size:.85rem}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--card);border-bottom:1px solid var(--line);overflow-x:auto;white-space:nowrap}
+nav .wrap{display:flex;gap:4px;align-items:center}
+nav a{padding:12px 14px;color:var(--ink);text-decoration:none;font-weight:600;font-size:.92rem}
+nav a:hover{color:var(--pri)}
+nav button{margin-left:0}
+#who{margin-left:auto}
+.sv{font-size:.8rem;color:var(--mut);padding:0 8px}
+section{padding:28px 0 8px}
+h2{margin:0 0 4px;font-size:1.35rem}
+.sub{color:var(--mut);margin:0 0 16px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:6px}
+.card h3{margin:0;font-size:1.05rem}
+.card p{margin:0;color:var(--mut);font-size:.9rem;flex:1}
+.ico{font-size:1.6rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:var(--pri);color:#fff;border:0;border-radius:10px;padding:9px 14px;font:600 .9rem inherit;font-family:inherit;cursor:pointer;text-decoration:none}
+.btn:hover{filter:brightness(1.1)}
+.btn.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.warn{background:#dc2626}
+.btn.acc{background:var(--acc);color:#1b1b1b}
+.board{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:900px){.board{grid-template-columns:1fr 260px}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.sw{width:30px;height:30px;border-radius:50%;border:3px solid var(--line);cursor:pointer;padding:0}
+.sw.on{border-color:var(--ink)}
+canvas{width:100%;height:auto;aspect-ratio:2/1;background:#fff;border:1px solid var(--line);border-radius:10px;touch-action:none;cursor:crosshair;display:block}
+.quiz{display:grid;gap:8px}
+.quiz .btn{justify-content:flex-start}
+.gal{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+.gal figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px}
+.gal img{width:100%;border-radius:8px;display:block}
+.gal figcaption{font-size:.8rem;color:var(--mut);display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.empty{color:var(--mut);font-style:italic}
+.tip{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#fef3c7;border:1px solid #f59e0b;color:#78350f;border-radius:10px;padding:10px 14px;margin-bottom:14px}
+.tip>div{display:flex;gap:10px;align-items:center;flex:1;min-width:240px}
+.tip h4{margin:0;color:#b45309;font-size:.9rem}
+.tip p{margin:2px 0 0;font-size:.85rem}
+.tip .tag{background:#f59e0b;color:#fff;padding:3px 8px;border-radius:6px;font-size:.68rem;font-weight:700;text-transform:uppercase}
+/* Galeri digital */
+.media{display:grid;gap:14px;grid-template-columns:1fr}
+@media(min-width:900px){.media{grid-template-columns:3fr 2fr}}
+.player{position:relative;aspect-ratio:16/9;background:#000;border-radius:10px;overflow:hidden;display:grid;place-items:center;color:#cbd5e1;text-align:center;padding:12px}
+.player iframe,.player video{position:absolute;inset:0;width:100%;height:100%;border:0;background:#000}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;align-items:center}
+.row input[type=text]{flex:1;min-width:140px;padding:9px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+.pl{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.pl .btn{width:100%;justify-content:flex-start;text-align:left}
+.works{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));max-height:430px;overflow-y:auto;padding-right:4px}
+.work{border:1px dashed var(--line);border-radius:10px;padding:8px;text-align:center;background:var(--bg);display:flex;flex-direction:column;gap:3px;align-items:center;justify-content:center}
+.work img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:6px;cursor:zoom-in}
+.work .ph{font-size:2rem}
+.work b{font-size:.8rem}.work small{color:var(--mut);font-size:.72rem}
+.work button{font-size:.72rem;padding:3px 8px}
+.badge{background:#e0f2fe;color:#0369a1;padding:3px 10px;border-radius:99px;font-size:.78rem;font-weight:700}
+dialog{border:0;border-radius:12px;padding:8px;max-width:92vw;background:var(--card);color:var(--ink)}
+dialog img{max-width:100%;max-height:78vh;display:block;border-radius:8px}
+dialog::backdrop{background:rgba(0,0,0,.7)}
+[hidden]{display:none!important}
+.in{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+.btn.alt.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+#cover{--bg:rgba(255,255,255,.08);--ink:#e8eefc;--line:rgba(255,255,255,.22);--mut:#a5b4d4;--pri:#6366f1;position:fixed;inset:0;z-index:50;overflow-y:auto;display:flex;padding:12px;color:var(--ink);text-align:center;background:radial-gradient(ellipse at 15% 15%,rgba(99,102,241,.5),transparent 55%),radial-gradient(ellipse at 85% 85%,rgba(56,189,248,.25),transparent 55%),radial-gradient(ellipse at 80% 10%,rgba(168,85,247,.3),transparent 50%),linear-gradient(160deg,#050a1f,#0b1340 55%,#1e1b4b)}
+#cover::before{content:"";position:fixed;inset:0;pointer-events:none;background-image:radial-gradient(1px 1px at 20px 30px,#fff,transparent),radial-gradient(1.5px 1.5px at 90px 120px,#c7d2fe,transparent),radial-gradient(1px 1px at 160px 60px,#fff,transparent),radial-gradient(1px 1px at 130px 170px,#bae6fd,transparent);background-size:200px 200px;opacity:.55;animation:tw 6s ease-in-out infinite alternate}
+@keyframes tw{from{opacity:.3}to{opacity:.7}}
+@media(prefers-reduced-motion:reduce){#cover::before{animation:none}}
+.cv-in{position:relative;z-index:1;width:100%;max-width:500px;margin:auto;padding:clamp(14px,3vh,26px) clamp(16px,4vw,30px);border-radius:16px;background:rgba(15,23,42,.62);border:1px solid rgba(165,180,252,.25);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 0 60px rgba(99,102,241,.3),0 14px 40px rgba(0,0,0,.5)}
+.cv-in h1{color:#fff;font-size:clamp(1.05rem,4.4vw,1.35rem);text-transform:uppercase;line-height:1.3;margin:0 0 6px}
+.pillars{font-size:.85rem;font-weight:700;color:#a5b4d4;margin:0 0 12px;letter-spacing:.3px}
+.pillars i{font-style:italic}
+.pwrap{width:fit-content;margin:0 auto 12px}
+.photo{width:clamp(96px,20vmin,132px);aspect-ratio:1/1;border-radius:50%;border:4px solid #818cf8;box-shadow:0 0 30px rgba(129,140,248,.6);background:radial-gradient(circle at 30% 25%,#312e81,#1e1b4b 70%);color:#e0e7ff;display:grid;place-items:center;font-size:clamp(2rem,8vmin,3rem);font-weight:800;letter-spacing:1px;line-height:1;text-indent:1px;user-select:none}
+.login{text-align:left}
+.shw{font-size:.8rem;color:var(--mut);display:flex;gap:6px;align-items:center}
+.fine{background:rgba(34,197,94,.12);border:1px solid rgba(134,239,172,.35);color:#bbf7d0;border-radius:8px;padding:7px 12px;font-size:.74rem;text-align:left;margin:0 0 12px}
+.cv-in .in{color:#fff}
+@media(max-height:660px){.photo{width:84px;font-size:1.9rem}.fine{display:none}.role{margin-bottom:8px}.pillars{margin-bottom:8px}}
+#tGuru.on{background:#4f46e5;border-color:#4f46e5}
+#tSiswa.on,#fSiswa .btn{background:#16a34a;border-color:#16a34a;color:#fff}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.sel{display:grid;gap:3px;font-size:.78rem;color:var(--mut);text-align:left}
+.cv-in select.in{color:#fff}.cv-in select option{color:#111}
+.meter{height:10px;background:var(--line);border-radius:99px;overflow:hidden;margin:8px 0 4px}
+#meterBar{height:100%;width:0;background:linear-gradient(90deg,#16a34a,#22c55e);transition:width .3s}
+.roster{columns:2 220px;margin:8px 0;padding-left:22px;font-size:.88rem}
+.roster li{break-inside:avoid;margin-bottom:2px}
+.roster button{margin-left:6px;border:0;background:none;color:#dc2626;cursor:pointer}
+.map{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:10px}
+@media(min-width:700px){.map{grid-template-columns:repeat(12,1fr)}}
+.cell{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:8px;padding:6px 2px;cursor:pointer;font:600 .8rem inherit;font-family:inherit;display:flex;flex-direction:column;align-items:center}
+.cell small{font-weight:400;color:var(--mut);font-size:.68rem}
+.cell.full{border-color:#16a34a}
+.cell.on{background:var(--pri);color:#fff;border-color:var(--pri)}.cell.on small{color:#e0e7ff}
+.disc{--ink:#e8eefc;--mut:#a5b4d4;--line:rgba(255,255,255,.22);--bg:rgba(255,255,255,.08);background:radial-gradient(ellipse at 10% 0%,rgba(99,102,241,.35),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(56,189,248,.18),transparent 55%),linear-gradient(160deg,#0a1030,#111a4a 60%,#1e1b4b);color:var(--ink);border:1px solid rgba(165,180,252,.28);border-radius:16px;padding:16px;box-shadow:0 0 40px rgba(99,102,241,.18)}
+.disc .hd{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.dmode{font-size:.75rem;padding:3px 10px;border-radius:99px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22)}
+.disc .in{color:#fff}.disc select option{color:#111}
+.dcomp{display:grid;gap:8px;margin-bottom:14px}
+.dmsg{background:rgba(255,255,255,.06);border:1px solid rgba(165,180,252,.2);border-radius:12px;padding:10px 12px;margin-bottom:10px}
+.dmsg .top{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.8rem;color:var(--mut)}
+.dmsg .top b{color:#fff}
+.av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#38bdf8);display:grid;place-items:center;font-weight:700;color:#fff;font-size:.8rem}
+.dmsg p{margin:6px 0;white-space:pre-wrap;word-break:break-word}
+.tag2{font-size:.7rem;padding:1px 8px;border-radius:99px;background:rgba(251,191,36,.18);color:#fcd34d}
+.tag2.ok{background:rgba(34,197,94,.18);color:#86efac}
+.drep{margin:6px 0 0 14px;padding:6px 10px;border-left:3px solid #818cf8;background:rgba(99,102,241,.15);border-radius:0 8px 8px 0;font-size:.9rem;word-break:break-word}
+.drep small{color:var(--mut)}
+.dact{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.dact .in{flex:1;min-width:160px}
+#dcList{max-height:520px;overflow-y:auto;padding-right:4px}
+.disc .empty{color:var(--mut)}
+.tbl{max-height:520px;overflow:auto;border:1px solid var(--line);border-radius:10px;margin:10px 0}
+#nlTable{width:100%;border-collapse:collapse;font-size:.92rem}
+#nlTable th{position:sticky;top:0;z-index:1;background:var(--pri);color:#fff;text-align:left;padding:8px 10px}
+#nlTable td{padding:3px 8px;border-top:1px solid var(--line)}
+#nlTable td:first-child{width:44px;text-align:center;color:var(--mut)}
+#nlTable input{width:100%;border:1px solid transparent;background:transparent;color:var(--ink);padding:6px;border-radius:6px;font:inherit}
+#nlTable input:focus{border-color:var(--pri);background:var(--bg);outline:0}
+#nlTable td.sc{width:96px}#nlTable td.sc input{text-align:center}
+#nlTable td.st{width:92px;font-size:.8rem;color:var(--mut)}
+#nlTable tr.low td{background:rgba(245,158,11,.13)}
+#nlTable tr.ok td.st{color:#16a34a;font-weight:700}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.stat{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-size:.78rem;color:var(--mut)}
+.stat b{display:block;font-size:1.05rem;color:var(--ink)}
+#hsTable{width:100%;border-collapse:collapse;font-size:.92rem}
+#hsTable th{position:sticky;top:0;z-index:1;background:var(--pri);color:#fff;text-align:left;padding:8px 10px}
+#hsTable td{padding:6px 10px;border-top:1px solid var(--line);vertical-align:top}
+#hsTable td:first-child{width:44px;text-align:center;color:var(--mut)}
+#hsTable tr.det td{background:var(--bg)}
+.rfc{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:8px 12px;margin:6px 0;font-size:.9rem}
+.rfc small{color:var(--mut)}.rfc p{margin:4px 0;white-space:pre-wrap;word-break:break-word}
+.rq{display:block;margin:12px 0 4px;font-size:.92rem}
+#abTable{width:100%;border-collapse:collapse;font-size:.92rem}
+#abTable th{position:sticky;top:0;z-index:1;background:var(--pri);color:#fff;text-align:left;padding:8px 10px}
+#abTable td{padding:4px 10px;border-top:1px solid var(--line)}
+#abTable td:first-child{width:44px;text-align:center;color:var(--mut)}
+#abTable select{padding:5px 8px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+#abTable tr.h select{border-color:#16a34a;color:#16a34a;font-weight:600}
+#abTable tr.x select{border-color:#f59e0b;color:#b45309;font-weight:600}
+#abTable tr.a select{border-color:#dc2626;color:#dc2626;font-weight:600}
+#fgTable{width:100%;border-collapse:collapse;font-size:.9rem}
+#fgTable th{position:sticky;top:0;z-index:1;background:var(--pri);color:#fff;text-align:left;padding:8px 10px}
+#fgTable td{padding:6px 10px;border-top:1px solid var(--line);vertical-align:top;word-break:break-word}
+.stars{display:flex;gap:2px}
+.stars button{font-size:1.9rem;line-height:1;background:none;border:0;cursor:pointer;color:var(--line);padding:2px}
+.stars button.on{color:#f59e0b}
+.tips{border-left:4px solid var(--acc);background:var(--bg);border-radius:0 10px 10px 0;padding:8px 12px;margin:10px 0;font-size:.9rem}
+.tips ul{margin:4px 0 0;padding-left:18px}
+.tabs{display:flex;gap:6px;margin-bottom:12px}.tabs .btn{flex:1}
+.login form{display:grid;gap:8px}
+.lerr{color:#dc2626;font-size:.85rem;min-height:1.1em;margin:6px 0 0}
+.player.lab{aspect-ratio:16/10;min-height:340px}
+.sub b,label b{color:var(--ink)}
+footer{text-align:center;color:var(--mut);font-size:.85rem;padding:28px 16px 36px}
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:10px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .25s}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="cover"><div class="cv-in">
+  <h1>BELAJAR BERMAKNA MELALUI PORTAL GURU FISIKA</h1>
+  <p class="pillars">✦ <i style="color:#fcd34d">Joyful Learning</i> • <i style="color:#7dd3fc">Mindful Learning</i> • <i style="color:#86efac">Meaningful Learning</i> ✦</p>
+  <div class="pwrap"><div class="photo" id="photoBox" role="img" aria-label="Logo FZ">FZ</div></div>
+  <p class="fine">🟢 <b>Auto-Save Aktif:</b> progres, catatan, dan sesi tersimpan otomatis di perangkat ini.</p>
+  <div id="cvResume" hidden><p id="cvWho" style="margin:0 0 12px;color:#e0e7ff"></p><div class="row" style="justify-content:center;margin:0 0 4px"><button class="btn" id="cvGo" type="button">▶ Lanjut ke Portal</button><button class="btn warn" id="cvOut" type="button">🚪 Logout</button></div></div>
+  <div class="login">
+    <div class="row2"><label class="sel">Tingkat<select class="in" id="cTingkat"></select></label><label class="sel">Nomor Rombel<select class="in" id="cNomor"></select></label></div>
+    <div class="tabs"><button class="btn alt" id="tGuru" type="button">👨‍🏫 Login GURU</button><button class="btn alt on" id="tSiswa" type="button">👨‍🎓 Login SISWA</button></div>
+    <form id="fSiswa"><input class="in" id="sNama" type="text" placeholder="Nama lengkap" autocomplete="name" aria-label="Nama lengkap"><input class="in" id="sPass" type="password" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Sandi bersama rombel" autocomplete="off" aria-label="Sandi bersama rombel"><label class="shw"><input type="checkbox" data-show="sPass"> Tampilkan sandi</label><button class="btn" type="submit">Masuk sebagai Siswa</button></form>
+    <form id="fGuru" hidden><input class="in" id="gPass" type="password" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Sandi master guru" autocomplete="off" aria-label="Sandi master guru"><label class="shw"><input type="checkbox" data-show="gPass"> Tampilkan sandi</label><button class="btn" type="submit">Masuk sebagai Guru</button><small style="color:var(--mut)">Sandi master khusus guru pemilik portal.</small></form>
+    <p class="lerr" id="lerr" role="alert"></p>
+  </div>
+</div></div>
+<div id="app" hidden>
+<header><div class="wrap">
+  <h1>⚛️ Portal Guru Fisika</h1>
+  <p id="welcome"></p>
+  <div class="chips"><span class="chip">🧘 Mindful</span><span class="chip">🎯 Meaningful</span><span class="chip">😄 Joyful</span><span class="chip">💻 Koding &amp; KA (KKA)</span></div>
+</div></header>
+<nav><div class="wrap">
+  <button class="btn alt" id="homeBtn" type="button" title="Kembali ke halaman cover">🏠 Cover</button>  <a href="#rombel">Rombel</a><a href="#nilai" id="navNilai" hidden>Rekap Nilai</a><a href="#absen" id="navAbs" hidden>Daftar Hadir</a><a href="#fbguru" id="navFbG" hidden>Umpan Balik</a><a href="#umpan" id="navUmpan" hidden>Umpan Balik</a><a href="#lab">Lab Virtual</a><a href="#diskusi">Diskusi</a><a href="#refleksi" id="navRefl" hidden>Refleksi</a><a href="#histori" id="navHist" hidden>Histori Refleksi</a><a href="#papan">Papan &amp; Kuis</a><a href="#galeri-digital">Galeri Digital</a><a href="#ai">Asisten AI</a><a href="#galeri">Galeri Bukti</a>
+  <span id="who"></span><span class="sv" id="saved"></span><button class="btn alt" id="themeBtn" type="button" aria-label="Ganti tema">🌓</button><button class="btn warn" id="logout" type="button">🚪 Logout</button>
+</div></nav>
+
+<main class="wrap">
+<section id="rombel">
+  <h2>🏫 Manajemen Kelas &amp; Rombel <span class="badge" id="rbBadge"></span></h2>
+  <p class="sub">36 rombel (Kelas X, XI, XII masing-masing 12) · setiap rombel 36 murid. Catatan, papan, dan daftar murid disimpan terpisah per rombel.</p>
+  <div class="panel">
+    <div class="row" style="margin-top:0"><b>Rombel aktif:</b>
+      <select class="in" id="dTingkat" style="width:auto" aria-label="Tingkat aktif"></select>
+      <select class="in" id="dNomor" style="width:auto" aria-label="Nomor rombel aktif"></select>
+      <span class="sub" id="rbNote" style="margin:0;font-size:.85rem"></span></div>
+    <p class="sub" id="abMine" style="margin:8px 0 0;font-size:.9rem"></p>
+    <div id="rbGuru">
+      <div class="row" style="justify-content:space-between;margin-bottom:0"><b id="rbCount"></b><span class="sub" style="margin:0;font-size:.8rem">Kapasitas 36 murid</span></div>
+      <div class="meter"><div id="meterBar"></div></div>
+      <ol class="roster" id="roster"></ol>
+      <textarea class="in" id="impNames" rows="3" placeholder="Tempel daftar nama murid rombel aktif, satu nama per baris (maks. 36)"></textarea>
+      <div class="row"><button class="btn" id="impBtn" type="button">Impor ke Rombel Aktif</button></div>
+      <h3 style="margin:8px 0 6px;font-size:1rem">🗺️ Peta 36 Rombel <span class="sub" style="font-size:.78rem">(klik untuk berpindah; angka kecil = murid terdaftar)</span></h3>
+      <div id="rbMap"></div>
+    </div>
+  </div>
+</section>
+
+<section id="nilai" hidden>
+  <h2>📊 Daftar Rekap Nilai Kuis <span class="badge" id="nlBadge"></span></h2>
+  <p class="sub">Panel khusus guru. Tabel 36 murid mengikuti rombel aktif dan tersimpan otomatis.</p>
+  <div class="panel">
+    <div class="row" style="margin-top:0">
+      <input class="in" id="nlTopik" type="text" maxlength="80" style="flex:2;min-width:180px;width:auto" placeholder="Topik / nama kuis (mis. Kuis Hukum Newton)" aria-label="Topik kuis">
+      <label style="font-size:.85rem;display:flex;gap:6px;align-items:center">KKM <input class="in" id="nlKkm" type="number" min="0" max="100" value="75" style="width:80px"></label>
+      <span class="sub" id="nlSave" style="margin:0;font-size:.8rem"></span>
+    </div>
+    <div class="stats" id="nlStats"></div>
+    <div class="tbl"><table id="nlTable"><thead><tr><th>No</th><th>Nama Siswa</th><th>Skor</th><th>Status</th></tr></thead><tbody id="nlBody"></tbody></table></div>
+    <div class="row" style="margin-bottom:0"><button class="btn alt" id="nlRoster" type="button">⬇ Ambil nama dari daftar murid</button><button class="btn alt" id="nlCopy" type="button">📋 Salin rekap</button><button class="btn warn" id="nlReset" type="button">🗑 Kosongkan skor</button></div>
+  </div>
+</section>
+
+<section id="absen" hidden>
+  <h2>🗓️ Daftar Hadir Digital <span class="badge" id="abBadge"></span></h2>
+  <p class="sub">Siswa tercatat hadir otomatis saat login (tanggal, jam, status). Guru dapat mengubah status menjadi Izin, Sakit, atau Alpa.</p>
+  <div class="panel">
+    <div class="row" style="margin-top:0"><label style="font-size:.85rem;display:flex;gap:6px;align-items:center">Tanggal <input class="in" type="date" id="abDate" style="width:auto"></label><span class="sub" id="abStat" style="margin:0;font-size:.82rem"></span></div>
+    <div class="stats" id="abSum"></div>
+    <div class="tbl"><table id="abTable"><thead><tr><th>No</th><th>Nama Siswa</th><th>Status</th><th>Jam Masuk</th></tr></thead><tbody id="abBody"></tbody></table></div>
+    <div class="row" style="margin-bottom:0"><button class="btn acc" id="abDl" type="button">📥 Unduh Daftar Hadir</button><button class="btn alt" id="abLog" type="button">Unduh log (tanggal &amp; jam)</button></div>
+  </div>
+</section>
+
+<section id="fbguru" hidden>
+  <h2>📈 Umpan Balik Siswa untuk Guru <span class="badge" id="fgBadge"></span></h2>
+  <p class="sub">Rekap masukan murid rombel aktif (hingga 36 responden) untuk refleksi diri dan diferensiasi pembelajaran.</p>
+  <div class="panel">
+    <div class="row" style="margin-top:0;justify-content:space-between"><span class="sub" id="fgStat" style="margin:0;font-size:.85rem"></span><button class="btn acc" id="fgDl" type="button">📥 Unduh Umpan Balik Guru</button></div>
+    <div class="stats" id="fgSum"></div>
+    <div class="tips" id="fgTips"></div>
+    <div class="tbl"><table id="fgTable"><thead><tr><th>Tanggal</th><th>Siswa</th><th>Kejelasan</th><th>Kecepatan</th><th>Kebutuhan</th><th>Saran</th></tr></thead><tbody id="fgBody"></tbody></table></div>
+  </div>
+</section>
+
+<section id="lab">
+  <h2>🔬 Laboratorium Virtual Interaktif</h2>
+  <p class="sub">Gratis &amp; berbasis web. Pilih lab untuk memuatnya di bingkai interaktif di bawah, atau buka di tab baru agar portal tetap terbuka.</p>
+  <div class="tip" id="panel-translit-panduan">
+    <div><span style="font-size:1.4rem">🌐</span>
+      <div><h4>Tips Bahasa (Terjemahkan ke Bahasa Indonesia):</h4>
+      <p>Jika lab virtual berbahasa asing, <b>klik kanan</b> di dalam area lab dan pilih <b>“Terjemahkan ke Bahasa Indonesia”</b>. Di HP: menu <b>⋮</b> peramban → <b>Terjemahkan</b>.</p></div>
+    </div>
+    <span class="tag">Otomatis Browser</span>
+  </div>
+  <div class="grid" id="labGrid"></div>
+  <div class="panel" id="labPanel" style="margin-top:14px">
+    <div class="row" style="justify-content:space-between;margin-top:0">
+      <b id="labTitle">Pilih salah satu lab di atas</b>
+      <span class="row" style="margin:0"><button class="btn acc" id="shotLab" type="button">📸 Tangkap Bukti Belajar (Screenshot)</button><a class="btn alt" id="labNew" target="_blank" rel="noopener noreferrer" hidden>Tab baru ↗</a></span>
+    </div>
+    <div class="player lab" id="labFrame"><span>🔬 Bingkai lab virtual akan tampil di sini.</span></div>
+    <p class="sub" style="font-size:.82rem;margin:6px 0 0">Jika bingkai kosong, situs lab tidak mengizinkan penyematan: gunakan “Tab baru ↗”.</p>
+    <label for="notes" style="display:block;margin:12px 0 4px"><b>📝 Catatan Belajar</b> <span class="sub" style="font-size:.8rem">(tersimpan otomatis)</span></label>
+    <textarea class="in" id="notes" rows="4" placeholder="Tulis hasil pengamatan, rumus, atau kesimpulan eksperimen..."></textarea>
+  </div>
+</section>
+
+<section id="diskusi">
+  <h2>💬 Ruang Diskusi &amp; Tanya Jawab Interaktif</h2>
+  <p class="sub">Siswa menulis pertanyaan atau catatan diskusi; guru pengampu membaca dan membalas setelah login dengan Sandi Master. Setiap rombel memiliki ruang diskusinya sendiri.</p>
+  <div class="disc">
+    <div class="hd"><b id="dcTitle" style="font-size:1.05rem"></b><span class="dmode" id="dcMode"></span><span class="dmode" id="dcStat"></span></div>
+    <div class="dcomp">
+      <textarea class="in" id="dcText" rows="3" maxlength="600" placeholder="Tulis pertanyaan atau catatan diskusi..." aria-label="Pesan diskusi"></textarea>
+      <div class="row" style="margin:0"><select class="in" id="dcType" style="width:auto" aria-label="Jenis pesan"><option value="tanya">❓ Pertanyaan</option><option value="catatan">📝 Catatan diskusi</option></select><button class="btn" id="dcSend" type="button">Kirim</button><span id="dcHint" style="font-size:.78rem;color:var(--mut)"></span></div>
+    </div>
+    <div id="dcList"></div>
+  </div>
+</section>
+
+<section id="refleksi" hidden>
+  <h2>🌱 Refleksi Pembelajaran Mendalam <span class="badge" id="rfBadge"></span></h2>
+  <p class="sub">Isi setelah sesi pembelajaran selesai. Jawabanmu tersimpan otomatis sebagai histori rombel.</p>
+  <div class="panel">
+    <input class="in" id="rfTopik" type="text" maxlength="80" placeholder="Topik / pertemuan hari ini (mis. Hukum Newton)" aria-label="Topik pertemuan">
+    <label class="rq" for="rfJ">😄 <b>Joyful</b>: Bagian apa dari pembelajaran hari ini yang paling menyenangkan bagimu, dan mengapa?</label>
+    <textarea class="in" id="rfJ" rows="3" maxlength="500"></textarea>
+    <label class="rq" for="rfM">🧘 <b>Mindful</b>: Bagaimana perasaan dan fokusmu selama belajar? Apa yang kamu sadari tentang cara belajarmu?</label>
+    <textarea class="in" id="rfM" rows="3" maxlength="500"></textarea>
+    <label class="rq" for="rfK">🎯 <b>Meaningful</b>: Konsep fisika apa yang kamu pahami hari ini, dan apa kaitannya dengan kehidupan sehari-hari?</label>
+    <textarea class="in" id="rfK" rows="3" maxlength="500"></textarea>
+    <div class="row"><button class="btn" id="rfSend" type="button">Kirim Refleksi</button><span class="sub" id="rfDraft" style="margin:0;font-size:.8rem"></span></div>
+    <h3 style="margin:12px 0 4px;font-size:1rem">📚 Histori refleksiku</h3>
+    <div id="rfMine"></div>
+  </div>
+</section>
+
+<section id="histori" hidden>
+  <h2>🗂️ Histori Refleksi Siswa <span class="badge" id="hsBadge"></span></h2>
+  <p class="sub">Rekap refleksi 36 murid pada rombel aktif. Klik “Lihat” untuk membaca jawabannya.</p>
+  <div class="panel">
+    <div class="row" style="margin-top:0;justify-content:space-between"><span class="sub" id="hsStat" style="margin:0"></span><button class="btn acc" id="hsDl" type="button">📥 Unduh Histori Refleksi</button></div>
+    <div class="tbl"><table id="hsTable"><thead><tr><th>No</th><th>Nama Siswa</th><th>Jumlah</th><th>Terakhir</th><th></th></tr></thead><tbody id="hsBody"></tbody></table></div>
+  </div>
+</section>
+
+<section id="papan">
+  <h2>🖍️ Papan Digital Interaktif</h2>
+  <p class="sub">Tulis rumus, gambar vektor, atau diagram benda bebas. Gunakan layar sentuh, mouse, atau stylus.</p>
+  <div class="board">
+    <div class="panel">
+      <div class="tools">
+        <span id="swatches" style="display:flex;gap:6px"></span>
+        <input type="color" id="picker" value="#1d4ed8" aria-label="Pilih warna" style="width:38px;height:34px;border:0;background:none;padding:0">
+        <label style="font-size:.85rem">Tebal <input type="range" id="size" min="1" max="24" value="4"></label>
+        <button class="btn alt" id="eraser" type="button">🧽 Penghapus</button>
+        <button class="btn warn" id="clear" type="button">🗑️ Bersihkan</button><button class="btn alt" id="undo" type="button">↩️ Urungkan</button>
+        <button class="btn acc" id="shot" type="button">📸 Tangkap Tampilan</button>
+      </div>
+      <canvas id="cv" width="1200" height="600"></canvas>
+    </div>
+    <div class="panel">
+      <h3 style="margin:0 0 4px">✅ Kuis Penutup KBM</h3>
+      <p class="sub" style="font-size:.85rem">Evaluasi akhir interaktif &amp; kolaboratif (hingga 36 murid).</p>
+      <div class="quiz" id="quizList"></div>
+    </div>
+  </div>
+</section>
+
+<section id="galeri-digital">
+  <h2>🎥 Ruang Galeri Digital: Video &amp; Produk Visual Siswa <span class="badge" id="cnt">0 / 36 karya</span></h2>
+  <p class="sub">Etalase portofolio KBM: video demonstrasi eksperimen dan produk visual kreatif (infografis, poster Canva) hasil pembelajaran mendalam.</p>
+  <div class="media">
+    <div class="panel">
+      <h3 style="margin:0 0 10px">📺 Ruang Putar Video Eksperimen</h3>
+      <div class="player" id="player"><span>▶️ Tempel tautan YouTube atau pilih berkas video dari perangkat, lalu putar.</span></div>
+      <div class="row">
+        <input type="text" id="vUrl" placeholder="Tautan YouTube (youtube.com / youtu.be)" aria-label="Tautan video">
+        <button class="btn" id="vPlay" type="button">Putar</button>
+        <label class="btn alt">📁 Berkas Video<input type="file" id="vFile" accept="video/*" hidden></label>
+      </div>
+      <p class="sub" style="font-size:.85rem;margin:0" id="vNote">Video yang sudah diputar masuk ke daftar putar di bawah.</p>
+      <ul class="pl" id="pl"></ul>
+    </div>
+    <div class="panel">
+      <h3 style="margin:0 0 10px">🖼️ Etalase Produk Visual &amp; Infografis</h3>
+      <div class="row">
+        <input type="text" id="wTitle" placeholder="Judul karya" aria-label="Judul karya">
+        <input type="text" id="wBy" placeholder="Karya: Kelompok / nama" aria-label="Pembuat">
+      </div>
+      <div class="row" style="margin-top:0">
+        <label class="btn alt">🖼️ Pilih Gambar<input type="file" id="wFile" accept="image/*" hidden></label>
+        <button class="btn" id="wAdd" type="button">Tambah Karya</button>
+        <span class="sub" style="margin:0;font-size:.82rem" id="wName"></span>
+      </div>
+      <div class="works" id="works"></div>
+      <p class="sub" style="font-size:.85rem;margin:8px 0 0">Klik gambar untuk memperbesar. Cocok untuk infografis atau poster buatan Canva AI.</p>
+    </div>
+  </div>
+  <dialog id="dlg"><img id="dlgImg" alt=""><div style="text-align:right;margin-top:6px"><button class="btn alt" id="dlgX" type="button">Tutup</button></div></dialog>
+</section>
+
+<section id="ai">
+  <h2>🤖 Asisten &amp; Media Pendukung AI</h2>
+  <p class="sub">Untuk eksplorasi, inkuiri, dan pembuatan materi ajar. Terbuka di tab baru.</p>
+  <div class="grid" id="aiGrid"></div>
+</section>
+
+<section id="galeri">
+  <h2>🗂️ Galeri Bukti Belajar</h2>
+  <p class="sub">Hasil tangkapan layar tampil di sini. Tekan lama (HP) atau klik kanan (komputer) pada gambar untuk menyimpan.</p>
+  <div class="gal" id="gal"><p class="empty" id="galEmpty">Belum ada tangkapan. Tekan “Tangkap Tampilan”.</p></div>
+</section>
+<section id="umpan" hidden>
+  <h2>💌 Umpan Balik untuk Guru <span class="badge" id="fbBadge"></span></h2>
+  <p class="sub">Isi di akhir sesi. Masukanmu membantu FADILLAH ZAM ZAM, S.Pd. menyesuaikan pembelajaran dengan kebutuhan setiap murid.</p>
+  <div class="panel">
+    <div class="rq"><b>1. Seberapa jelas penjelasan guru hari ini?</b></div>
+    <div class="stars" id="fbStars" role="radiogroup" aria-label="Kejelasan penjelasan"></div>
+    <div class="sub" id="fbRateTxt" style="font-size:.82rem;margin:2px 0 0">Belum dinilai</div>
+    <label class="rq" for="fbSpeed"><b>2. Bagaimana kecepatan belajar hari ini bagimu?</b></label>
+    <select class="in" id="fbSpeed"><option value="">Pilih...</option><option>Terlalu lambat</option><option>Pas</option><option>Terlalu cepat</option></select>
+    <label class="rq" for="fbNeed"><b>3. Bantuan apa yang kamu butuhkan?</b></label>
+    <select class="in" id="fbNeed"><option value="">Pilih...</option><option>Perlu penjelasan ulang / bimbingan lebih</option><option>Sudah cukup dengan penjelasan di kelas</option><option>Siap tantangan / pengayaan</option></select>
+    <label class="rq" for="fbSaran"><b>4. Saran untuk guru</b> <span class="sub" style="font-size:.8rem">(opsional)</span></label>
+    <textarea class="in" id="fbSaran" rows="3" maxlength="500" placeholder="Tuliskan saran atau harapanmu..."></textarea>
+    <label style="display:flex;gap:8px;align-items:center;margin:10px 0;font-size:.9rem"><input type="checkbox" id="fbAnon"> Kirim sebagai anonim (namaku tidak ditampilkan di rekap guru)</label>
+    <div class="row" style="margin:0"><button class="btn" id="fbSend" type="button">Kirim Umpan Balik</button><span class="sub" id="fbDraft" style="margin:0;font-size:.8rem"></span></div>
+  </div>
+</section>
+</main>
+<footer>Portal Fisika · Dibuat untuk pembelajaran bermakna, berkesadaran, dan menggembirakan.</footer>
+</div>
+<div id="toast" role="status"></div>
+
+<script>
+/* ===== PENGATURAN SERVER (opsional) =====
+   Isi dengan URL aplikasi web Google Apps Script yang berakhiran /exec agar
+   absensi, refleksi, umpan balik, dan diskusi tersimpan di Google Sheets.
+   Biarkan "" untuk memakai penyimpanan di perangkat saja. */
+const CLOUD_URL="https://script.google.com/macros/s/AKfycbwC8xDBH1xioIdy61Y6hffDPSLHpKtwmlK4Vt0VwxIGWH-1USyhLiTgWyopwkX9d1Xr/exec";
+const LABS=[
+ ["🌐","PhET Interactive Simulations","Standar global HTML5 untuk mekanika, listrik, gelombang, dan fisika modern.","https://phet.colorado.edu/in/"],
+ ["📈","oPhysics Simulations","Visualisasi mekanika & osilasi berbasis JavaScript.","https://ophysics.com/"],
+ ["🧲","Walter Fendt Physics","Applet klasik HTML5: gerak, gelombang, optik, kelistrikan.","https://www.walter-fendt.de/html5/phen/"],
+ ["🔌","Interactive Circuit Lab (Falstad)","Praktikum rangkaian listrik dan elektronika.","https://www.falstad.com/circuit/"],
+ ["📝","PhysicsLab","Bank modul latihan dan lembar kerja fisika.","https://physicslab.org/"],
+ ["🧪","oLab","Laboratorium virtual interaktif tambahan.","https://www.olabs.edu.in/"]
+];
+const AIS=[
+ ["✨","Gemini AI","https://gemini.google.com/"],
+ ["🟠","Claude AI","https://claude.ai/"],
+ ["🎨","Canva AI","https://www.canva.com/ai-image-generator/"],
+ ["🔎","Perplexity AI","https://www.perplexity.ai/"],
+ ["🤗","Hugging Face Chat","https://huggingface.co/chat/"],
+ ["🪟","Microsoft Copilot","https://copilot.microsoft.com/"]
+];
+const QUIZ=[["🎮","Quizizz","https://quizizz.com/"],["📋","Google Forms (Belajar.id)","https://forms.google.com/"],["🧩","Wordwall","https://wordwall.net/"],["🏆","Kahoot!","https://kahoot.it/"]];
+const $=s=>document.querySelector(s);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const link=(u,t,c="btn")=>`<a class="${c}" href="${u}" target="_blank" rel="noopener noreferrer">${t}</a>`;
+$("#labGrid").innerHTML=LABS.map((l,i)=>`<article class="card"><span class="ico">${l[0]}</span><h3>${i+1}. ${esc(l[1])}</h3><p>${esc(l[2])}</p><div class="row" style="margin:6px 0 0"><button class="btn" type="button" data-i="${i}">▶ Muat di Bingkai</button>${link(l[3],"Tab baru ↗","btn alt")}</div></article>`).join("");
+$("#aiGrid").innerHTML=AIS.map(a=>`<article class="card"><span class="ico">${a[0]}</span><h3>${esc(a[1])}</h3>${link(a[2],"Buka ↗")}</article>`).join("");
+$("#quizList").innerHTML=QUIZ.map(q=>link(q[2],`${q[0]} ${esc(q[1])}`,"btn alt")).join("");
+
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2600)}
+$("#themeBtn").onclick=()=>{const r=document.documentElement,d=getComputedStyle(r).getPropertyValue("--bg").trim()==="#0d1424";r.dataset.theme=d?"light":"dark"};
+
+/* Papan digital */
+const cv=$("#cv"),ctx=cv.getContext("2d");
+let color="#1d4ed8",erase=false,drawing=false,last=null;
+function fill(){ctx.fillStyle="#fff";ctx.fillRect(0,0,cv.width,cv.height)}
+fill();
+const COLORS=["#111111","#1d4ed8","#dc2626","#16a34a","#f59e0b"];
+const sw=$("#swatches");
+COLORS.forEach((c,i)=>{const b=document.createElement("button");b.type="button";b.className="sw"+(i===1?" on":"");b.style.background=c;b.setAttribute("aria-label","Warna "+c);b.onclick=()=>setColor(c);sw.appendChild(b)});
+function setColor(c){color=c;erase=false;$("#picker").value=c;$("#eraser").classList.remove("acc");[...sw.children].forEach((b,i)=>b.classList.toggle("on",COLORS[i]===c))}
+$("#picker").oninput=e=>setColor(e.target.value);
+$("#eraser").onclick=e=>{erase=!erase;e.currentTarget.classList.toggle("acc",erase)};
+let prev=null;
+$("#clear").onclick=()=>{prev=cv.toDataURL();fill();queueSave();toast("Papan dibersihkan (bisa diurungkan)")};
+$("#undo").onclick=()=>{if(!prev)return;const im=new Image();im.onload=()=>{ctx.drawImage(im,0,0);queueSave()};im.src=prev;prev=null};
+const pos=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*cv.width/r.width,y:(e.clientY-r.top)*cv.height/r.height}};
+function line(a,b){ctx.strokeStyle=erase?"#fff":color;ctx.lineWidth=erase?$("#size").value*3:$("#size").value;ctx.lineCap=ctx.lineJoin="round";ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}
+cv.addEventListener("pointerdown",e=>{drawing=true;cv.setPointerCapture(e.pointerId);last=pos(e);line(last,{x:last.x+.01,y:last.y})});
+cv.addEventListener("pointermove",e=>{if(!drawing)return;const p=pos(e);line(last,p);last=p});
+["pointerup","pointercancel","pointerleave"].forEach(ev=>cv.addEventListener(ev,()=>drawing=false));
+
+/* Galeri digital */
+const pl=[];
+function ytId(u){const m=u.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/);return m?m[1]:null}
+function show(it){
+  const P=$("#player");P.innerHTML="";
+  if(it.type==="yt"){const f=document.createElement("iframe");f.src="https://www.youtube-nocookie.com/embed/"+it.id;f.title=it.title;f.allow="accelerometer; encrypted-media; picture-in-picture; fullscreen";f.allowFullscreen=true;P.appendChild(f);
+    $("#vNote").innerHTML=`Jika video tidak tampil, <a href="${it.link}" target="_blank" rel="noopener noreferrer">buka di YouTube ↗</a>.`}
+  else{const v=document.createElement("video");v.src=it.src;v.controls=true;v.playsInline=true;P.appendChild(v);v.play().catch(()=>{});$("#vNote").textContent="Berkas lokal hanya tersedia selama halaman ini terbuka."}
+}
+function renderPl(){const ul=$("#pl");ul.innerHTML="";pl.forEach(it=>{const li=document.createElement("li"),b=document.createElement("button");b.type="button";b.className="btn alt";b.textContent=(it.type==="yt"?"▶ ":"🎞️ ")+it.title;b.onclick=()=>show(it);li.appendChild(b);ul.appendChild(li)})}
+function addVid(it){pl.push(it);renderPl();show(it)}
+$("#vPlay").onclick=()=>{const u=$("#vUrl").value.trim(),id=ytId(u);if(!id){toast("Tautan YouTube tidak dikenali");return}addVid({type:"yt",id,link:"https://www.youtube.com/watch?v="+id,title:"Video YouTube "+(pl.length+1)});$("#vUrl").value=""};
+$("#vFile").onchange=e=>{const f=e.target.files[0];if(!f)return;addVid({type:"file",src:URL.createObjectURL(f),title:f.name});e.target.value=""};
+
+const works=[{ph:"📊",t:"Infografis Hukum Newton",by:"Kelompok 1"},{ph:"⚡",t:"Poster Rangkaian Listrik",by:"Kelompok 2"}];
+let pending=null;
+function renderWorks(){
+  const box=$("#works");box.innerHTML="";
+  works.forEach((w,i)=>{
+    const d=document.createElement("div");d.className="work";
+    if(w.src){const im=document.createElement("img");im.src=w.src;im.alt=w.t;im.onclick=()=>{$("#dlgImg").src=w.src;$("#dlgImg").alt=w.t;$("#dlg").showModal()};d.appendChild(im)}
+    else{const s=document.createElement("span");s.className="ph";s.textContent=w.ph;d.appendChild(s)}
+    const b=document.createElement("b");b.textContent=w.t;const sm=document.createElement("small");sm.textContent="Karya: "+w.by;
+    const x=document.createElement("button");x.type="button";x.className="btn alt";x.textContent="Hapus";x.onclick=()=>{works.splice(i,1);renderWorks()};
+    d.append(b,sm,x);box.appendChild(d);
+  });
+  $("#cnt").textContent=works.filter(w=>w.src).length+" / 36 karya";
+}
+$("#wFile").onchange=e=>{pending=e.target.files[0]||null;$("#wName").textContent=pending?pending.name:""};
+$("#wAdd").onclick=()=>{
+  const t=$("#wTitle").value.trim();if(!pending||!t){toast("Isi judul dan pilih gambar dulu");return}
+  works.push({src:URL.createObjectURL(pending),t,by:$("#wBy").value.trim()||"Siswa"});
+  pending=null;$("#wFile").value="";$("#wName").textContent="";$("#wTitle").value="";$("#wBy").value="";renderWorks();toast("Karya ditambahkan");
+};
+$("#dlgX").onclick=()=>$("#dlg").close();
+$("#dlg").addEventListener("click",e=>{if(e.target.id==="dlg")e.currentTarget.close()});
+renderWorks();
+
+/* Tangkap tampilan */
+let n=0;
+function addShot(url,label){
+  n++;$("#galEmpty")?.remove();
+  const f=document.createElement("figure"),t=new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+  f.innerHTML=`<img alt="${label} ${n}" src="${url}"><figcaption><span>${label} #${n} · ${t}</span><button class="btn alt" type="button">Hapus</button></figcaption>`;
+  f.querySelector("button").onclick=()=>{f.remove();if(!$("#gal figure"))$("#gal").innerHTML='<p class="empty" id="galEmpty">Belum ada tangkapan. Tekan “Tangkap Tampilan”.</p>'};
+  $("#gal").prepend(f);
+}
+async function shoot(){
+  if(navigator.mediaDevices?.getDisplayMedia){
+    try{
+      toast("Pilih tab/jendela lab virtual yang ingin ditangkap");
+      const st=await navigator.mediaDevices.getDisplayMedia({video:true,audio:false});
+      const v=document.createElement("video");v.srcObject=st;v.muted=true;await v.play();
+      await new Promise(r=>setTimeout(r,350));
+      const c=document.createElement("canvas");c.width=v.videoWidth;c.height=v.videoHeight;c.getContext("2d").drawImage(v,0,0);
+      st.getTracks().forEach(t=>t.stop());
+      addShot(c.toDataURL("image/png"),"Layar lab");toast("Tersimpan di Galeri Bukti Belajar");
+      $("#galeri").scrollIntoView();return;
+    }catch(err){/* dibatalkan / tidak didukung: pakai papan */}
+  }
+  addShot(cv.toDataURL("image/png"),"Papan");toast("Papan ditangkap ke Galeri");
+}
+$("#shot").onclick=shoot;$("#shotLab").onclick=shoot;
+/* Penyimpanan, sesi, auto-save */
+const mem={};
+const S={get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return mem[k]??null}},set(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}},del(k){delete mem[k];try{localStorage.removeItem(k)}catch(e){}}};
+let user=null,data={notes:"",board:"",lab:-1},st=null;
+const ukey=u=>"pf:d:"+u.role+":"+u.name.toLowerCase()+":"+u.rombel;
+const setSaved=t=>$("#saved").textContent="💾 "+t;
+const H={guru:"7633530d12139f51945ef848d5188a4a14f83cb842535b3deea00a52b747eb42",siswa:"4c298530ebecb9a83da4e7d3fa209769ebe1e31d6a2588f7c99d2df067855681"};
+function sha256js(msg){
+  const b=new TextEncoder().encode(msg),L=b.length,N=(((L+8)>>6)+1)<<6,w=new Uint8Array(N);
+  w.set(b);w[L]=128;const dv=new DataView(w.buffer);dv.setUint32(N-4,(L*8)>>>0);dv.setUint32(N-8,Math.floor(L*8/4294967296));
+  const K=[],H=[];let p=2,c=0;
+  while(c<64){let pr=true;for(let d=2;d*d<=p;d++)if(p%d===0){pr=false;break}if(pr){if(c<8)H[c]=(Math.pow(p,.5)%1*4294967296)|0;K[c]=(Math.pow(p,1/3)%1*4294967296)|0;c++}p++}
+  const W=new Array(64),rr=(x,n)=>(x>>>n)|(x<<(32-n));
+  for(let o=0;o<N;o+=64){
+    for(let i=0;i<16;i++)W[i]=dv.getUint32(o+i*4);
+    for(let i=16;i<64;i++){const s0=rr(W[i-15],7)^rr(W[i-15],18)^(W[i-15]>>>3),s1=rr(W[i-2],17)^rr(W[i-2],19)^(W[i-2]>>>10);W[i]=(W[i-16]+s0+W[i-7]+s1)|0}
+    let [a,b2,c2,d,e,f,g,h]=H;
+    for(let i=0;i<64;i++){const S1=rr(e,6)^rr(e,11)^rr(e,25),ch=(e&f)^(~e&g),t1=(h+S1+ch+K[i]+W[i])|0,S0=rr(a,2)^rr(a,13)^rr(a,22),mj=(a&b2)^(a&c2)^(b2&c2),t2=(S0+mj)|0;h=g;g=f;f=e;e=(d+t1)|0;d=c2;c2=b2;b2=a;a=(t1+t2)|0}
+    [a,b2,c2,d,e,f,g,h].forEach((v,i)=>{H[i]=(H[i]+v)|0});
+  }
+  return H.map(x=>(x>>>0).toString(16).padStart(8,"0")).join("");
+}
+async function sha(x){const t="pf|"+x;try{if(window.crypto&&crypto.subtle){const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(t));return [...new Uint8Array(b)].map(n=>n.toString(16).padStart(2,"0")).join("")}}catch(e){}return sha256js(t)}
+let fails=0,lockUntil=0;
+function blocked(el){const w=lockUntil-Date.now();if(w>0){el.textContent="Terlalu banyak percobaan. Coba lagi dalam "+Math.ceil(w/1000)+" detik.";return true}return false}
+function wrong(el){if(++fails>=5){fails=0;lockUntil=Date.now()+30000;el.textContent="Sandi salah 5 kali. Dikunci 30 detik."}else el.textContent="Sandi salah."}
+function saveNow(){if(!user)return;data.notes=$("#notes").value;try{data.board=cv.toDataURL("image/jpeg",.7)}catch(e){}const ok=S.set(ukey(user),data);setSaved(ok?"Tersimpan "+new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}):"Penyimpanan penuh/tidak tersedia")}
+function queueSave(){clearTimeout(st);st=setTimeout(saveNow,700)}
+$("#notes").addEventListener("input",queueSave);
+cv.addEventListener("pointerup",queueSave);
+document.addEventListener("visibilitychange",()=>{if(document.hidden)saveNow()});
+addEventListener("pagehide",saveNow);
+
+/* Lab: bingkai iframe */
+function openLab(i,quiet){
+  const l=LABS[i];if(!l)return;data.lab=i;
+  const f=document.createElement("iframe");f.src=l[3];f.title=l[1];f.loading="lazy";f.allowFullscreen=true;
+  f.setAttribute("sandbox","allow-scripts allow-same-origin allow-forms allow-popups allow-pointer-lock allow-fullscreen");
+  const P=$("#labFrame");P.innerHTML="";P.appendChild(f);
+  $("#labTitle").textContent="🔬 "+l[1];const a=$("#labNew");a.href=l[3];a.hidden=false;
+  if(!quiet){queueSave();$("#labPanel").scrollIntoView({behavior:"smooth"})}
+}
+$("#labGrid").onclick=e=>{const b=e.target.closest("[data-i]");if(b)openLab(+b.dataset.i)};
+
+/* Rekap nilai kuis (guru) */
+const nl={r:null,topik:"",kkm:75,rows:[]};let nlT=null,nlArm=null;
+const nlKey=r=>"pf:nilai:"+r;
+(function(){const tb=$("#nlBody");for(let i=0;i<36;i++){const tr=document.createElement("tr");tr.innerHTML=`<td>${i+1}</td><td><input type="text" maxlength="60" data-i="${i}" data-f="n" placeholder="Nama siswa" aria-label="Nama siswa ${i+1}"></td><td class="sc"><input type="number" min="0" max="100" step="0.5" inputmode="decimal" data-i="${i}" data-f="s" aria-label="Skor siswa ${i+1}"></td><td class="st">-</td>`;tb.appendChild(tr)}})();
+const nlRow=i=>$("#nlBody").rows[i];
+function nlSaveNow(){if(!nl.r)return;clearTimeout(nlT);nlT=null;const ok=S.set(nlKey(nl.r),{topik:nl.topik,kkm:nl.kkm,rows:nl.rows});$("#nlSave").textContent=ok?"💾 Tersimpan "+new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}):"⚠️ Penyimpanan penuh/tidak tersedia";nlPush()}
+function nlQueue(){clearTimeout(nlT);nlT=setTimeout(nlSaveNow,500)}
+function nlCalc(){
+  const sc=[];let tuntas=0;
+  nl.rows.forEach((x,i)=>{const v=x.s===""?NaN:parseFloat(x.s),tr=nlRow(i),st=tr.cells[3];
+    if(isNaN(v)){st.textContent="-";tr.className=""}else{sc.push(v);const ok=v>=nl.kkm;if(ok)tuntas++;st.textContent=ok?"Tuntas":"Remedial";tr.className=ok?"ok":"low"}});
+  const f=n=>Number.isInteger(n)?n:n.toFixed(1),cell=(l,v)=>`<div class="stat">${l}<b>${v}</b></div>`;
+  $("#nlStats").innerHTML=cell("Terisi",sc.length+" / 36")+cell("Rata-rata",sc.length?f(sc.reduce((a,b)=>a+b,0)/sc.length):"-")+cell("Tertinggi",sc.length?f(Math.max(...sc)):"-")+cell("Terendah",sc.length?f(Math.min(...sc)):"-")+cell("Tuntas",tuntas+" / "+sc.length);
+}
+function nlLoad(r){
+  if(nlT)nlSaveNow();
+  const d=S.get(nlKey(r))||{};nl.r=r;nl.ready=false;nl.topik=d.topik||"";nl.kkm=typeof d.kkm==="number"?d.kkm:75;
+  nl.rows=Array.from({length:36},(_,i)=>Object.assign({n:"",s:""},(d.rows||[])[i]));
+  const L=rosterOf(r);let filled=false;nl.rows.forEach((x,i)=>{if(!x.n&&L[i]){x.n=L[i];filled=true}});
+  $("#nlTopik").value=nl.topik;$("#nlKkm").value=nl.kkm;$("#nlBadge").textContent="Rombel "+r;
+  nl.rows.forEach((x,i)=>{const tr=nlRow(i);tr.cells[1].firstChild.value=x.n;tr.cells[2].firstChild.value=x.s});
+  nlCalc();$("#nlSave").textContent=d.rows?"Data dipulihkan":"Auto-Save aktif";if(filled)nlSaveNow();nlPull(r);
+}
+$("#nlBody").addEventListener("input",e=>{const t=e.target,f=t.dataset.f;if(!f)return;const i=+t.dataset.i;let v=t.value;
+  if(f==="s"&&v!==""){const n=parseFloat(v);if(isNaN(n))v="";else if(n>100){v="100";t.value=v}else if(n<0){v="0";t.value=v}}
+  nl.rows[i][f]=v;nlCalc();nlQueue()});
+$("#nlTopik").addEventListener("input",e=>{nl.topik=e.target.value;nlQueue()});
+$("#nlKkm").addEventListener("input",e=>{const n=parseFloat(e.target.value);nl.kkm=isNaN(n)?75:Math.min(100,Math.max(0,n));nlCalc();nlQueue()});
+$("#nlRoster").onclick=()=>{const L=rosterOf(nl.r);let c=0;nl.rows.forEach((x,i)=>{if(!x.n&&L[i]){x.n=L[i];nlRow(i).cells[1].firstChild.value=L[i];c++}});nlSaveNow();toast(c?c+" nama diambil dari daftar murid":"Tidak ada baris kosong yang bisa diisi")};
+$("#nlCopy").onclick=async()=>{const t=["Rekap Nilai Kuis"+(nl.topik?": "+nl.topik:"")+" · Rombel "+nl.r,"No\tNama\tSkor"].concat(nl.rows.map((x,i)=>(i+1)+"\t"+x.n+"\t"+x.s)).join("\n");try{await navigator.clipboard.writeText(t);toast("Rekap disalin. Tempel ke Excel/Sheets.")}catch(e){toast("Penyalinan diblokir peramban.")}};
+$("#nlReset").onclick=e=>{const b=e.currentTarget;if(!nlArm){b.textContent="Klik lagi untuk konfirmasi";nlArm=setTimeout(()=>{nlArm=null;b.textContent="🗑 Kosongkan skor"},3000);return}clearTimeout(nlArm);nlArm=null;b.textContent="🗑 Kosongkan skor";nl.rows.forEach((x,i)=>{x.s="";nlRow(i).cells[2].firstChild.value=""});nlCalc();nlSaveNow();toast("Skor dikosongkan")};
+addEventListener("pagehide",nlSaveNow);
+
+/* Sinkron rekap nilai ke Google Sheets (khusus guru) */
+const nlSync={};let nlQ=Promise.resolve();
+const nlSid=i=>"s"+String(i+1).padStart(2,"0");
+function nlPush(){
+  if(!AUTH||AUTH.role!=="guru"||!nl.r||!nl.ready)return;
+  const r=nl.r,snap={rows:nl.rows.map(x=>Object.assign({},x)),topik:nl.topik,kkm:nl.kkm},st=nlSync[r]=nlSync[r]||{sent:{},meta:""};
+  nlQ=nlQ.then(async()=>{
+    const meta=JSON.stringify([snap.topik,snap.kkm]);
+    if(st.meta!==meta){await cloudCall("set",{table:"nilai",rombel:r,id:"meta",data:{meta:true,topik:snap.topik,kkm:snap.kkm}});st.meta=meta}
+    for(let i=0;i<36;i++){const x=snap.rows[i],js=JSON.stringify(x);
+      if(st.sent[i]===js||(!x.n&&x.s===""&&st.sent[i]===undefined))continue;
+      await cloudCall("set",{table:"nilai",rombel:r,id:nlSid(i),data:{no:i+1,nama:x.n,skor:x.s}});st.sent[i]=js}
+    if(nl.r===r)$("#nlSave").textContent="☁️ Tersinkron ke Google Sheets "+new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
+  }).catch(()=>{if(nl.r===r)$("#nlSave").textContent="⚠️ Gagal sinkron; tersimpan di perangkat"});
+}
+async function nlPull(r){
+  if(!AUTH||AUTH.role!=="guru")return;
+  try{
+    const x=await cloudCall("list",{table:"nilai",rombel:r});
+    if(nl.r!==r)return;
+    const st=nlSync[r]=nlSync[r]||{sent:{},meta:""};
+    x.rows.forEach(d=>{
+      if(d.id==="meta"){nl.topik=d.data.topik||"";nl.kkm=typeof d.data.kkm==="number"?d.data.kkm:75;st.meta=JSON.stringify([nl.topik,nl.kkm])}
+      else{const i=parseInt(d.id.slice(1),10)-1;if(i>=0&&i<36){nl.rows[i]={n:d.data.nama||nl.rows[i].n,s:(d.data.skor===""||d.data.skor==null)?"":String(d.data.skor)};st.sent[i]=JSON.stringify({n:d.data.nama||"",s:nl.rows[i].s})}}
+    });
+    nl.rows.forEach((x,i)=>{const tr=nlRow(i);tr.cells[1].firstChild.value=x.n;tr.cells[2].firstChild.value=x.s});
+    $("#nlTopik").value=nl.topik;$("#nlKkm").value=nl.kkm;nlCalc();
+    S.set(nlKey(r),{topik:nl.topik,kkm:nl.kkm,rows:nl.rows});
+    nl.ready=true;nlPush();
+  }catch(e){}
+}
+
+/* Ruang Diskusi per rombel */
+const disc={db:null,unsub:null,list:[],r:null,shared:false};
+const dkey=r=>"pf:disc:"+r;
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const fmt=t=>new Date(t).toLocaleString("id-ID",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+const mk=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e};
+const dcol=()=>disc.db.collection("disc/"+disc.r+"/msgs");
+function discOpen(r){
+  if(disc.unsub){try{disc.unsub()}catch(e){}disc.unsub=null}
+  disc.r=r;disc.shared=!!disc.db;
+  $("#dcTitle").textContent="Rombel "+r;
+  $("#dcMode").textContent=disc.shared?(CLOUD_URL?"☁️ Google Sheets":"🌐 Mode bersama"):"💾 Mode lokal";
+  $("#dcHint").textContent=disc.shared?"Pesan tersinkron untuk semua pengguna yang berhak.":"Pesan hanya tampil di perangkat ini.";
+  if(disc.shared){
+    try{disc.unsub=dcol().orderBy("ts","asc").onSnapshot(sn=>{disc.list=sn.docs.map(d=>Object.assign({id:d.id},d.data()));discRender()},()=>{disc.db=null;discOpen(r);toast("Sinkron gagal, beralih ke mode lokal")})}
+    catch(e){disc.db=null;discOpen(r)}
+  }else{disc.list=S.get(dkey(r))||[];discRender()}
+}
+function localPut(m){const L=S.get(dkey(disc.r))||[],i=L.findIndex(x=>x.id===m.id);if(i>=0)L[i]=m;else L.push(m);disc.list=L.slice(-200);S.set(dkey(disc.r),disc.list);discRender()}
+async function discPut(m){
+  if(disc.shared){try{const o=Object.assign({},m);delete o.id;await dcol().doc(m.id).set(o);return}catch(e){disc.db=null;discOpen(disc.r);toast("Penyimpanan bersama ditolak. Beralih ke mode lokal.")}}
+  localPut(m);
+}
+async function discDel(id){
+  if(disc.shared){try{await dcol().doc(id).delete()}catch(e){toast("Gagal menghapus pesan")}return}
+  disc.list=disc.list.filter(x=>x.id!==id);S.set(dkey(disc.r),disc.list);discRender();
+}
+function discRender(){
+  const box=$("#dcList");box.innerHTML="";const g=user&&user.role==="guru";
+  const open=disc.list.filter(m=>m.role==="siswa"&&m.type==="tanya"&&!m.done).length;
+  $("#dcStat").textContent=g?open+" pertanyaan belum dijawab":disc.list.length+" pesan";
+  if(!disc.list.length){box.appendChild(mk("p","empty","Belum ada diskusi di rombel ini. Jadilah yang pertama bertanya."));return}
+  [...disc.list].reverse().forEach(m=>{
+    const c=mk("div","dmsg"),top=mk("div","top");
+    top.append(mk("span","av",(m.name||"?").charAt(0).toUpperCase()),mk("b","",m.name||"Siswa"));
+    if(m.role==="guru")top.append(mk("span","tag2 ok","Guru"));
+    top.append(mk("span","tag2",m.type==="tanya"?"❓ Pertanyaan":"📝 Catatan"));
+    if(m.done)top.append(mk("span","tag2 ok","✅ Terjawab"));
+    top.append(mk("span","",fmt(m.ts)));
+    c.append(top,mk("p","",m.text));
+    (m.replies||[]).forEach(rp=>{const d=mk("div","drep");d.append(mk("b","","👨‍🏫 "+(rp.by||"Guru")+": "),rp.text,document.createElement("br"),mk("small","",fmt(rp.ts)));c.appendChild(d)});
+    if(g){
+      const a=mk("div","dact"),inp=mk("input","in");inp.type="text";inp.placeholder="Tulis balasan guru...";inp.maxLength=600;inp.setAttribute("aria-label","Balasan guru");
+      const bR=mk("button","btn","Balas");bR.type="button";
+      bR.onclick=()=>{const t=inp.value.trim();if(!t)return;discPut(Object.assign({},m,{replies:[...(m.replies||[]),{by:"Guru",text:t,ts:Date.now()}],done:true}))};
+      const bD=mk("button","btn alt",m.done?"↺ Buka lagi":"✔ Tandai terjawab");bD.type="button";bD.onclick=()=>discPut(Object.assign({},m,{done:!m.done}));
+      const bX=mk("button","btn warn","Hapus");bX.type="button";bX.onclick=()=>discDel(m.id);
+      a.append(inp,bR,bD,bX);c.appendChild(a);
+    }
+    box.appendChild(c);
+  });
+}
+$("#dcSend").onclick=()=>{
+  const t=$("#dcText").value.trim();if(!t||!user)return;
+  discPut({id:uid(),name:user.name,role:user.role,type:$("#dcType").value,text:t,ts:Date.now(),done:false,replies:[]});
+  $("#dcText").value="";
+};
+addEventListener("storage",e=>{if(!disc.shared&&disc.r&&e.key===dkey(disc.r)){disc.list=S.get(dkey(disc.r))||[];discRender()}});
+(async()=>{try{const c=window.claude;if(c&&c.use){const d=await c.use("db"),u=await c.use("user"),can=u?await u.can("data.write"):null;if(!CLOUD_URL&&d&&can!==false)disc.db=d}}catch(e){}if(user&&!CLOUD_URL){discOpen(user.rombel);rfOpen(user.rombel);abOpen(user.rombel);fbOpen(user.rombel);abMark()}})();
+
+/* Refleksi & ekspor */
+const rf={r:null,list:[],unsub:null,shared:false},hsOpen=new Set();let rdT=null;
+const rkey=r=>"pf:refl:"+r,rdKey=()=>"pf:rdraft:"+user.rombel+":"+user.name.toLowerCase();
+const rcol=()=>disc.db.collection("refl/"+rf.r+"/items");
+const RF_IDS=["#rfTopik","#rfJ","#rfM","#rfK"];
+function rfOpen(r){
+  if(rf.unsub){try{rf.unsub()}catch(e){}rf.unsub=null}
+  rf.r=r;rf.shared=!!disc.db;$("#hsBadge").textContent=$("#rfBadge").textContent="Rombel "+r;
+  const local=()=>{rf.shared=false;rf.list=S.get(rkey(r))||[];rfRender()};
+  if(rf.shared){try{rf.unsub=rcol().orderBy("ts","asc").onSnapshot(sn=>{rf.list=sn.docs.map(d=>Object.assign({id:d.id},d.data()));rfRender()},local)}catch(e){local()}}
+  else local();
+  rfDraftLoad();
+}
+async function rfPut(m){
+  if(rf.shared){try{const o=Object.assign({},m);delete o.id;await rcol().doc(m.id).set(o);return}catch(e){rf.shared=false;toast("Penyimpanan bersama ditolak. Beralih ke mode lokal.")}}
+  const L=S.get(rkey(rf.r))||[];L.push(m);rf.list=L.slice(-600);S.set(rkey(rf.r),rf.list);rfRender();
+}
+function rdSave(){if(!user||user.role!=="siswa")return;S.set(rdKey(),{t:$("#rfTopik").value,j:$("#rfJ").value,m:$("#rfM").value,k:$("#rfK").value});$("#rfDraft").textContent="💾 Draf tersimpan otomatis"}
+RF_IDS.forEach(x=>$(x).addEventListener("input",()=>{clearTimeout(rdT);rdT=setTimeout(rdSave,500)}));
+function rfDraftLoad(){if(!user||user.role!=="siswa")return;const d=S.get(rdKey())||{};$("#rfTopik").value=d.t||"";$("#rfJ").value=d.j||"";$("#rfM").value=d.m||"";$("#rfK").value=d.k||"";$("#rfDraft").textContent=(d.j||d.m||d.k)?"Draf dipulihkan":""}
+$("#rfSend").onclick=async()=>{
+  const t=$("#rfTopik").value.trim(),j=$("#rfJ").value.trim(),m=$("#rfM").value.trim(),k=$("#rfK").value.trim();
+  if(j.length<5||m.length<5||k.length<5){toast("Lengkapi ketiga jawaban refleksi (min. 5 karakter)");return}
+  clearTimeout(rdT);
+  await rfPut({id:uid(),name:user.name,rombel:user.rombel,topik:t,j,m,k,ts:Date.now()});
+  S.del(rdKey());RF_IDS.forEach(x=>$(x).value="");$("#rfDraft").textContent="";toast("Refleksi terkirim. Terima kasih!");
+};
+function rfCard(m,withName){
+  const c=mk("div","rfc");c.append(mk("small","",fmt(m.ts)+(m.topik?" · "+m.topik:"")+(withName?" · "+m.name:"")));
+  [["😄 Joyful",m.j],["🧘 Mindful",m.m],["🎯 Meaningful",m.k]].forEach(a=>{const p=mk("p");p.append(mk("b","",a[0]+": "),a[1]||"");c.appendChild(p)});
+  return c;
+}
+function mineRender(){
+  const box=$("#rfMine");box.innerHTML="";const me=user.name.toLowerCase();
+  const L=rf.list.filter(m=>(m.name||"").toLowerCase()===me).reverse();
+  if(!L.length){box.appendChild(mk("p","sub","Belum ada refleksi terkirim."));return}
+  L.forEach(m=>box.appendChild(rfCard(m,false)));
+}
+function hsData(){
+  const by=new Map(),names=[...rosterOf(rf.r)];
+  rf.list.forEach(m=>{const k=(m.name||"").toLowerCase();if(!by.has(k))by.set(k,[]);by.get(k).push(m)});
+  by.forEach((v,k)=>{if(!names.some(n=>n.toLowerCase()===k))names.push(v[0].name)});
+  while(names.length<36)names.push("");
+  return {names,by};
+}
+function hsRender(){
+  const {names,by}=hsData(),tb=$("#hsBody");tb.innerHTML="";let filled=0;
+  names.forEach((nm,i)=>{
+    const it=nm?(by.get(nm.toLowerCase())||[]):[];if(it.length)filled++;
+    const tr=document.createElement("tr");
+    [String(i+1),nm||"—",it.length?String(it.length):"-",it.length?fmt(it[it.length-1].ts):"-"].forEach(v=>tr.appendChild(mk("td","",v)));
+    const td=document.createElement("td");
+    if(it.length){const b=mk("button","btn alt",hsOpen.has(nm)?"Tutup":"Lihat");b.type="button";b.style.padding="3px 10px";b.onclick=()=>{hsOpen.has(nm)?hsOpen.delete(nm):hsOpen.add(nm);hsRender()};td.appendChild(b)}
+    tr.appendChild(td);tb.appendChild(tr);
+    if(it.length&&hsOpen.has(nm)){const d=document.createElement("tr");d.className="det";const c=document.createElement("td");c.colSpan=5;[...it].reverse().forEach(m=>c.appendChild(rfCard(m,false)));d.appendChild(c);tb.appendChild(d)}
+  });
+  $("#hsStat").textContent=filled+" / 36 murid sudah mengisi · "+rf.list.length+" refleksi · "+(rf.shared?"🌐 mode bersama":"💾 mode lokal");
+}
+function rfRender(){if(!user)return;if(user.role==="guru")hsRender();else mineRender()}
+const csvCell=v=>{let t=String(v==null?"":v);if(/^[=+\-@\t\r]/.test(t))t="'"+t;return '"'+t.replace(/"/g,'""')+'"'};
+async function dlFile(name,text){
+  const c=window.claude,d=(c&&c.use)?await c.use("downloads"):null;
+  if(d){try{await d.save({filename:name,data:"\ufeff"+text})}catch(e){if(!e||e.code!=="declined")toast("Unduhan gagal: "+((e&&(e.message||e.code))||"tidak diketahui"))}return}
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob(["\ufeff"+text],{type:"text/csv;charset=utf-8"}));a.download=name;document.body.appendChild(a);a.click();a.remove();toast("Unduhan dimulai");
+}
+$("#hsDl").onclick=()=>{
+  const {names,by}=hsData(),rows=[["Rombel","No","Nama Siswa","Tanggal","Topik/Pertemuan","Joyful","Mindful","Meaningful"]];
+  names.forEach((nm,i)=>{if(!nm)return;const it=by.get(nm.toLowerCase())||[];
+    if(!it.length)rows.push([rf.r,i+1,nm,"","","(belum mengisi)","",""]);
+    else it.forEach(m=>rows.push([rf.r,i+1,nm,new Date(m.ts).toLocaleString("id-ID"),m.topik||"",m.j,m.m,m.k]))});
+  if(rows.length===1){toast("Belum ada data untuk diunduh");return}
+  dlFile("refleksi-"+rf.r+"-"+new Date().toISOString().slice(0,10)+".csv",rows.map(r=>r.map(csvCell).join(",")).join("\r\n"));
+};
+
+/* Daftar hadir */
+const ab={r:null,list:[],unsub:null,shared:false};
+const akey=r=>"pf:abs:"+r,acol=()=>disc.db.collection("abs/"+ab.r+"/items");
+const pad2=n=>String(n).padStart(2,"0");
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+pad2(d.getMonth()+1)+"-"+pad2(d.getDate())};
+const nowT=()=>{const d=new Date();return pad2(d.getHours())+":"+pad2(d.getMinutes())+":"+pad2(d.getSeconds())};
+const nhash=n=>{let h=5381;for(const c of n)h=(h*33^c.charCodeAt(0))>>>0;return h.toString(36)};
+const aid=(d,n)=>d+"_"+n.toLowerCase().replace(/[^a-z0-9]+/g,"_").slice(0,60)+"_"+nhash(n.toLowerCase());
+function abLocal(fn){const L=S.get(akey(ab.r))||[];fn(L);ab.list=L;S.set(akey(ab.r),L);abRender()}
+function abOpen(r){
+  if(ab.unsub){try{ab.unsub()}catch(e){}ab.unsub=null}
+  ab.r=r;ab.shared=!!disc.db;$("#abBadge").textContent="Rombel "+r;if(!$("#abDate").value)$("#abDate").value=today();
+  const local=()=>{ab.shared=false;ab.list=S.get(akey(r))||[];abRender()};
+  if(ab.shared){try{ab.unsub=acol().onSnapshot(sn=>{ab.list=sn.docs.map(d=>Object.assign({id:d.id},d.data()));abRender()},local)}catch(e){local()}}
+  else local();
+}
+async function abPut(rec){
+  if(ab.shared){try{const o=Object.assign({},rec);delete o.id;await acol().doc(rec.id).set(o);return}catch(e){ab.shared=false;toast("Penyimpanan bersama ditolak. Beralih ke mode lokal.")}}
+  abLocal(L=>{const i=L.findIndex(x=>x.id===rec.id);if(i>=0)L[i]=rec;else L.push(rec)});
+}
+async function abDel(id){
+  if(ab.shared){try{await acol().doc(id).delete()}catch(e){toast("Gagal menghapus")}return}
+  abLocal(L=>{const i=L.findIndex(x=>x.id===id);if(i>=0)L.splice(i,1)});
+}
+async function abMark(){
+  if(!user||user.role!=="siswa")return;
+  if(ab.r!==user.rombel)abOpen(user.rombel);
+  const d=today(),id=aid(d,user.name),rec={id,name:user.name,rombel:user.rombel,date:d,time:nowT(),status:"Hadir",ts:Date.now(),by:"auto"};
+  if(ab.shared){try{const ref=acol().doc(id),sn=await ref.get();if(!sn.exists){const o=Object.assign({},rec);delete o.id;await ref.set(o);toast("✅ Kehadiran tercatat: "+rec.time)}return}catch(e){ab.shared=false}}
+  if((S.get(akey(ab.r))||[]).some(x=>x.id===id))return;
+  abLocal(L=>L.push(rec));toast("✅ Kehadiran tercatat: "+rec.time);
+}
+function abNames(){const names=[...rosterOf(ab.r)];ab.list.forEach(m=>{if(!names.some(n=>n.toLowerCase()===m.name.toLowerCase()))names.push(m.name)});while(names.length<36)names.push("");return names}
+const abFind=(d,n)=>ab.list.find(x=>x.date===d&&x.name.toLowerCase()===n.toLowerCase());
+function abRender(){
+  if(!user)return;
+  if(user.role==="siswa"){const m=ab.list.find(x=>x.id===aid(today(),user.name));$("#abMine").textContent=m?"✅ Kehadiran hari ini tercatat: "+m.status+" · "+m.time:"Kehadiran hari ini belum tercatat.";return}
+  $("#abMine").textContent="";
+  const date=$("#abDate").value||today(),tb=$("#abBody");tb.innerHTML="";const cnt={Hadir:0,Izin:0,Sakit:0,Alpa:0,Belum:0};
+  abNames().forEach((nm,i)=>{
+    const m=nm?abFind(date,nm):null,tr=document.createElement("tr");
+    tr.append(mk("td","",String(i+1)),mk("td","",nm||"—"));
+    const td=document.createElement("td");
+    if(nm){const sel=document.createElement("select");sel.setAttribute("aria-label","Status "+nm);
+      [["","— Belum —"],["Hadir","Hadir"],["Izin","Izin"],["Sakit","Sakit"],["Alpa","Alpa"]].forEach(o=>{const op=mk("option","",o[1]);op.value=o[0];sel.appendChild(op)});
+      sel.value=m?m.status:"";
+      sel.onchange=()=>{const v=sel.value;if(!v){if(m)abDel(m.id);return}abPut({id:aid(date,nm),name:nm,rombel:ab.r,date,time:m?m.time:(v==="Hadir"?nowT():"-"),status:v,ts:m?m.ts:Date.now(),by:"guru"})};
+      td.appendChild(sel);cnt[m?m.status:"Belum"]++;tr.className=m?(m.status==="Hadir"?"h":m.status==="Alpa"?"a":"x"):""}
+    tr.append(td,mk("td","",m?m.time:"-"));tb.appendChild(tr);
+  });
+  $("#abSum").innerHTML=[["Hadir",cnt.Hadir],["Izin",cnt.Izin],["Sakit",cnt.Sakit],["Alpa",cnt.Alpa],["Belum tercatat",cnt.Belum]].map(a=>`<div class="stat">${a[0]}<b>${a[1]}</b></div>`).join("");
+  $("#abStat").textContent=ab.shared?"🌐 mode bersama":"💾 mode lokal (perangkat ini)";
+}
+$("#abDate").addEventListener("change",abRender);
+$("#abDl").onclick=()=>{
+  const names=abNames().filter(Boolean),dates=[...new Set(ab.list.map(m=>m.date))].sort();
+  if(!dates.length){toast("Belum ada data kehadiran");return}
+  const code={Hadir:"H",Izin:"I",Sakit:"S",Alpa:"A"},rows=[["Daftar Hadir Rombel "+ab.r+" (H=Hadir, I=Izin, S=Sakit, A=Alpa)"],["No","Nama Siswa"].concat(dates,["Hadir","Izin","Sakit","Alpa"])];
+  names.forEach((nm,i)=>{const c={Hadir:0,Izin:0,Sakit:0,Alpa:0};const cells=dates.map(d=>{const m=abFind(d,nm);if(!m)return"";c[m.status]=(c[m.status]||0)+1;return code[m.status]||""});rows.push([i+1,nm].concat(cells,[c.Hadir,c.Izin,c.Sakit,c.Alpa]))});
+  dlFile("daftar-hadir-"+ab.r+"-"+today()+".csv",rows.map(r=>r.map(csvCell).join(",")).join("\r\n"));
+};
+$("#abLog").onclick=()=>{
+  if(!ab.list.length){toast("Belum ada data kehadiran");return}
+  const names=abNames(),rows=[["Rombel","Tanggal","Jam","No","Nama Siswa","Status","Dicatat oleh"]];
+  [...ab.list].sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time)).forEach(m=>rows.push([ab.r,m.date,m.time,names.findIndex(n=>n.toLowerCase()===m.name.toLowerCase())+1,m.name,m.status,m.by==="guru"?"Guru":"Otomatis"]));
+  dlFile("log-hadir-"+ab.r+"-"+today()+".csv",rows.map(r=>r.map(csvCell).join(",")).join("\r\n"));
+};
+
+/* Umpan balik guru & diferensiasi */
+const fb={r:null,list:[],unsub:null,shared:false};
+const fkey=r=>"pf:fb:"+r,fcol=()=>disc.db.collection("fb/"+fb.r+"/items"),fdKey=()=>"pf:fbdraft:"+user.rombel+":"+user.name.toLowerCase();
+const RATE_TXT=["Belum dinilai","Sangat kurang jelas","Kurang jelas","Cukup jelas","Jelas","Sangat jelas"];
+let fbRate=0,fbT=null;
+function fbStars(){
+  const box=$("#fbStars");box.innerHTML="";
+  for(let n=1;n<=5;n++){const b=mk("button",n<=fbRate?"on":"","★");b.type="button";b.setAttribute("role","radio");b.setAttribute("aria-checked",String(n===fbRate));b.setAttribute("aria-label",n+" bintang");b.onclick=()=>{fbRate=n;fbStars();fbDraftQ()};box.appendChild(b)}
+  $("#fbRateTxt").textContent=fbRate?fbRate+" / 5 · "+RATE_TXT[fbRate]:RATE_TXT[0];
+}
+function fbOpen(r){
+  if(fb.unsub){try{fb.unsub()}catch(e){}fb.unsub=null}
+  fb.r=r;fb.shared=!!disc.db;$("#fbBadge").textContent=$("#fgBadge").textContent="Rombel "+r;
+  const local=()=>{fb.shared=false;fb.list=S.get(fkey(r))||[];fbRender()};
+  if(fb.shared){try{fb.unsub=fcol().orderBy("ts","asc").onSnapshot(sn=>{fb.list=sn.docs.map(d=>Object.assign({id:d.id},d.data()));fbRender()},local)}catch(e){local()}}
+  else local();
+  fbDraftLoad();
+}
+async function fbPut(m){
+  if(fb.shared){try{const o=Object.assign({},m);delete o.id;await fcol().doc(m.id).set(o);return}catch(e){fb.shared=false;toast("Penyimpanan bersama ditolak. Beralih ke mode lokal.")}}
+  const L=S.get(fkey(fb.r))||[];L.push(m);fb.list=L.slice(-600);S.set(fkey(fb.r),fb.list);fbRender();
+}
+function fbDraftQ(){clearTimeout(fbT);fbT=setTimeout(fbDraftSave,500)}
+function fbDraftSave(){if(!user||user.role!=="siswa")return;S.set(fdKey(),{r:fbRate,sp:$("#fbSpeed").value,nd:$("#fbNeed").value,sg:$("#fbSaran").value,an:$("#fbAnon").checked});$("#fbDraft").textContent="💾 Draf tersimpan otomatis"}
+function fbDraftLoad(){if(!user||user.role!=="siswa")return;const d=S.get(fdKey())||{};fbRate=d.r||0;$("#fbSpeed").value=d.sp||"";$("#fbNeed").value=d.nd||"";$("#fbSaran").value=d.sg||"";$("#fbAnon").checked=!!d.an;$("#fbDraft").textContent=(d.r||d.sp||d.nd||d.sg)?"Draf dipulihkan":"";fbStars()}
+["#fbSpeed","#fbNeed","#fbSaran","#fbAnon"].forEach(x=>{$(x).addEventListener("input",fbDraftQ);$(x).addEventListener("change",fbDraftQ)});
+$("#fbSend").onclick=async()=>{
+  const sp=$("#fbSpeed").value,nd=$("#fbNeed").value,an=$("#fbAnon").checked;
+  if(!fbRate||!sp||!nd){toast("Isi penilaian kejelasan, kecepatan, dan bantuan yang kamu butuhkan");return}
+  clearTimeout(fbT);
+  await fbPut({id:uid(),name:an?"":user.name,anon:an,rombel:user.rombel,rate:fbRate,speed:sp,need:nd,saran:$("#fbSaran").value.trim(),ts:Date.now()});
+  S.del(fdKey());fbRate=0;$("#fbSpeed").value=$("#fbNeed").value=$("#fbSaran").value="";$("#fbAnon").checked=false;$("#fbDraft").textContent="";fbStars();
+  toast("Terima kasih! Umpan balikmu terkirim.");
+};
+const pct=(n,t)=>t?Math.round(n/t*100):0;
+function fbStats(){
+  const L=fb.list,n=L.length,avg=n?L.reduce((a,m)=>a+(+m.rate||0),0)/n:0;
+  const cs=k=>L.filter(m=>m.speed===k).length,cn=k=>L.filter(m=>(m.need||"").startsWith(k)).length;
+  const named=new Set(L.filter(m=>m.name).map(m=>m.name.toLowerCase())).size,anon=L.filter(m=>!m.name).length;
+  return {n,avg,lambat:cs("Terlalu lambat"),pas:cs("Pas"),cepat:cs("Terlalu cepat"),ulang:cn("Perlu"),cukup:cn("Sudah"),tantang:cn("Siap"),resp:named+anon};
+}
+function fbTips(t){
+  if(!t.n)return ["Belum ada masukan. Rekomendasi diferensiasi muncul setelah murid mengisi."];
+  const o=[];
+  if(t.avg<3.5)o.push("Kejelasan penjelasan masih rendah (rata-rata "+t.avg.toFixed(1)+"): tambahkan contoh konkret, analogi, atau demonstrasi lab virtual sebelum rumus.");
+  if(pct(t.cepat,t.n)>=30)o.push("Banyak murid merasa terlalu cepat: beri jeda cek pemahaman dan contoh langkah demi langkah (scaffolding).");
+  if(pct(t.lambat,t.n)>=30)o.push("Banyak murid merasa terlalu lambat: sediakan tugas pengayaan atau tantangan tambahan.");
+  if(pct(t.ulang,t.n)>=30)o.push("Cukup banyak murid perlu penjelasan ulang: siapkan sesi remedial kelompok kecil atau video penjelasan ulang.");
+  if(pct(t.tantang,t.n)>=30)o.push("Sebagian murid siap tantangan: siapkan soal HOTS atau proyek pengayaan sebagai jalur belajar kedua.");
+  if(!o.length)o.push("Penilaian cukup seimbang. Pertahankan ritme dan tetap sediakan pilihan tugas bertingkat.");
+  return o;
+}
+function fbRender(){
+  if(!user||user.role!=="guru")return;
+  const t=fbStats(),tb=$("#fgBody");tb.innerHTML="";
+  [...fb.list].reverse().forEach(m=>{
+    const tr=document.createElement("tr"),r=+m.rate||0;
+    tr.append(mk("td","",fmt(m.ts)),mk("td","",m.name||"Anonim"),mk("td","","★".repeat(r)+"☆".repeat(5-r)+" ("+r+")"),mk("td","",m.speed||"-"),mk("td","",m.need||"-"),mk("td","",m.saran||"-"));tb.appendChild(tr);
+  });
+  if(!t.n){const tr=document.createElement("tr"),td=mk("td","sub","Belum ada umpan balik di rombel ini.");td.colSpan=6;tr.appendChild(td);tb.appendChild(tr)}
+  const c=(l,v)=>`<div class="stat">${l}<b>${v}</b></div>`;
+  $("#fgSum").innerHTML=c("Responden",t.resp+" / 36")+c("Rata-rata kejelasan",t.n?t.avg.toFixed(1)+" / 5":"-")+c("Terlalu lambat",t.lambat)+c("Pas",t.pas)+c("Terlalu cepat",t.cepat)+c("Perlu penjelasan ulang",t.ulang)+c("Sudah cukup",t.cukup)+c("Siap pengayaan",t.tantang);
+  const ul=document.createElement("ul");fbTips(t).forEach(x=>ul.appendChild(mk("li","",x)));
+  const tp=$("#fgTips");tp.innerHTML="";tp.append(mk("b","","💡 Rekomendasi diferensiasi (otomatis dari data)"),ul);
+  $("#fgStat").textContent=t.n+" masukan · "+(fb.shared?"🌐 mode bersama":"💾 mode lokal (perangkat ini)");
+}
+$("#fgDl").onclick=()=>{
+  if(!fb.list.length){toast("Belum ada umpan balik untuk diunduh");return}
+  const t=fbStats(),rows=[["Rombel","Tanggal","Siswa","Kejelasan (1-5)","Kecepatan belajar","Kebutuhan bantuan","Saran untuk guru"]];
+  fb.list.forEach(m=>rows.push([fb.r,new Date(m.ts).toLocaleString("id-ID"),m.name||"Anonim",m.rate,m.speed,m.need,m.saran||""]));
+  rows.push([],["Ringkasan"],["Jumlah masukan",t.n],["Rata-rata kejelasan",t.avg.toFixed(2)],["Terlalu lambat",t.lambat],["Pas",t.pas],["Terlalu cepat",t.cepat],["Perlu penjelasan ulang",t.ulang],["Sudah cukup",t.cukup],["Siap pengayaan",t.tantang]);
+  dlFile("umpan-balik-guru-"+fb.r+"-"+today()+".csv",rows.map(r=>r.map(csvCell).join(",")).join("\r\n"));
+};
+fbStars();
+
+/* Lapisan Google Sheets (Apps Script) */
+let AUTH=null;
+async function cloudRaw(body){const r=await fetch(CLOUD_URL,{method:"POST",body:JSON.stringify(body),redirect:"follow"});return r.json()}
+async function cloudCall(action,p){
+  const r=await cloudRaw(Object.assign({action,token:AUTH&&AUTH.token},p));
+  if(r&&r.error==="auth"){toast("Sesi berakhir. Silakan login lagi.");S.del("pf:session");setTimeout(()=>location.reload(),1500)}
+  if(r&&r.error)throw new Error(r.error);
+  return r;
+}
+function cloudDb(){
+  const subs=[],parse=p=>{const a=p.split("/");return{table:a[0],rombel:a[1]}};
+  const snap=rows=>({docs:rows.map(x=>({id:x.id,exists:true,data:()=>x.data}))});
+  const refresh=(t,r)=>subs.filter(s=>s.table===t&&s.rombel===r).forEach(s=>s.run());
+  return{collection(path){const c=parse(path);const q={
+    orderBy(){return q},
+    onSnapshot(cb,err){
+      let alive=true,timer=null;
+      const stop=()=>{alive=false;if(timer)clearInterval(timer);const i=subs.indexOf(s);if(i>=0)subs.splice(i,1)};
+      const s={table:c.table,rombel:c.rombel,run:async()=>{try{const r=await cloudCall("list",{table:c.table,rombel:c.rombel});if(alive)cb(snap(r.rows))}catch(e){if(alive){stop();if(err)err(e)}}}};
+      if(AUTH.role==="guru"||c.table==="disc")timer=setInterval(()=>{if(!document.hidden)s.run()},30000);
+      subs.push(s);s.run();return stop;
+    },
+    doc(id){return{
+      async get(){const r=await cloudCall("get",{table:c.table,rombel:c.rombel,id});return{id,exists:!!r.exists,data:()=>r.data}},
+      async set(o){await cloudCall("set",{table:c.table,rombel:c.rombel,id,data:o});refresh(c.table,c.rombel)},
+      async delete(){await cloudCall("del",{table:c.table,rombel:c.rombel,id});refresh(c.table,c.rombel)}
+    }}
+  };return q}};
+}
+async function cloudRoster(r){
+  try{const x=await cloudCall("roster",{rombel:r});S.set("pf:roster:"+r,x.names);if(user&&user.rombel===r)renderRombel()}catch(e){}
+}
+async function doLogin(role,name,pw,rombel,el){
+  if(CLOUD_URL){
+    try{
+      const r=await cloudRaw({action:"login",role,name,pw,rombel});
+      if(r.ok){AUTH={token:r.token,exp:r.exp,role,name:r.name,rombel:r.rombel};return{name:r.name,rombel:r.rombel,token:r.token,exp:r.exp}}
+      if(r.error==="pw"){wrong(el);return null}
+      if(r.error==="full"){el.textContent="Rombel "+rombel+" sudah penuh (36/36). Hubungi guru.";return null}
+      if(r.error==="config"){el.textContent="Server belum diatur: isi sandi di Properti skrip.";return null}
+      el.textContent="Server menolak login ("+r.error+").";return null;
+    }catch(e){toast("Server tidak terjangkau. Memakai mode lokal.")}
+  }
+  if(await sha(pw)!==(role==="guru"?H.guru:H.siswa)){wrong(el);return null}
+  return{name,rombel};
+}
+
+/* Login */
+document.querySelectorAll("[data-show]").forEach(c=>c.addEventListener("change",()=>{$("#"+c.dataset.show).type=c.checked?"text":"password"}));
+function tab(m){$("#fSiswa").hidden=m!=="siswa";$("#fGuru").hidden=m!=="guru";$("#tSiswa").classList.toggle("on",m==="siswa");$("#tGuru").classList.toggle("on",m==="guru");$("#lerr").textContent=""}
+$("#tSiswa").onclick=()=>tab("siswa");$("#tGuru").onclick=()=>tab("guru");
+const err=m=>{$("#lerr").textContent=m};
+const TING=["X","XI","XII"],NOM=Array.from({length:12},(_,i)=>String(i+1).padStart(2,"0"));
+const rosterOf=r=>S.get("pf:roster:"+r)||[];
+function fillSel(t,n){t.innerHTML=TING.map(x=>`<option>${x}</option>`).join("");n.innerHTML=NOM.map(x=>`<option>${x}</option>`).join("")}
+fillSel($("#cTingkat"),$("#cNomor"));fillSel($("#dTingkat"),$("#dNomor"));
+const cur=()=>$("#cTingkat").value+"-"+$("#cNomor").value;
+function register(name,r){const L=rosterOf(r);if(L.some(x=>x.toLowerCase()===name.toLowerCase()))return true;if(L.length>=36)return false;L.push(name);S.set("pf:roster:"+r,L);return true}
+function renderRombel(){
+  const r=user.rombel,g=user.role==="guru",[t,n]=r.split("-");
+  $("#dTingkat").value=t;$("#dNomor").value=n;$("#dTingkat").disabled=$("#dNomor").disabled=!g;
+  $("#welcome").textContent=(g?"Selamat datang, ":"Selamat belajar, ")+user.name+" · Rombel "+r;
+  $("#who").textContent=(g?"👨‍🏫 Guru":"🎒 Siswa")+" · "+r;
+  $("#rbBadge").textContent="Aktif: "+r;
+  $("#rbNote").textContent=g?"Pilih rombel untuk memantau; data tiap rombel terpisah.":"Anda terdaftar di rombel ini.";
+  $("#rbGuru").hidden=!g;$("#nilai").hidden=!g;$("#navNilai").hidden=!g;$("#absen").hidden=!g;$("#navAbs").hidden=!g;$("#fbguru").hidden=!g;$("#navFbG").hidden=!g;$("#umpan").hidden=g;$("#navUmpan").hidden=g;$("#refleksi").hidden=g;$("#navRefl").hidden=g;$("#histori").hidden=!g;$("#navHist").hidden=!g;if(!g)return;nlLoad(r);
+  const L=rosterOf(r);$("#rbCount").textContent=L.length+" / 36 murid";$("#meterBar").style.width=(L.length/36*100)+"%";
+  const ol=$("#roster");ol.innerHTML="";
+  L.forEach((nm,i)=>{const li=document.createElement("li");li.append(nm);const b=document.createElement("button");b.type="button";b.textContent="✕";b.setAttribute("aria-label","Hapus "+nm);b.onclick=()=>{const a=rosterOf(r),gone=a[i];a.splice(i,1);S.set("pf:roster:"+r,a);if(AUTH&&gone)cloudCall("rosterdel",{rombel:r,name:gone}).catch(()=>{});renderRombel()};li.appendChild(b);ol.appendChild(li)});
+  const map=$("#rbMap");map.innerHTML="";
+  TING.forEach(tt=>{const h=document.createElement("div");h.className="sub";h.style.cssText="margin:6px 0 4px;font-size:.8rem";h.textContent="Kelas "+tt;const gr=document.createElement("div");gr.className="map";
+    NOM.forEach(nn=>{const id=tt+"-"+nn,c=rosterOf(id).length,b=document.createElement("button");b.type="button";b.className="cell"+(id===r?" on":"")+(c>=36?" full":"");b.dataset.r=id;b.title="Rombel "+id;b.append(nn);const sm=document.createElement("small");sm.textContent=c;b.appendChild(sm);gr.appendChild(b)});
+    map.append(h,gr)});
+}
+function loadData(){
+  data=Object.assign({notes:"",board:"",lab:-1},S.get(ukey(user))||{});
+  $("#notes").value=data.notes;fill();
+  if(data.board){const im=new Image();im.onload=()=>ctx.drawImage(im,0,0,cv.width,cv.height);im.src=data.board}
+  if(data.lab>=0)openLab(data.lab,true);else{$("#labFrame").innerHTML="<span>🔬 Bingkai lab virtual akan tampil di sini.</span>";$("#labTitle").textContent="Pilih salah satu lab di atas";$("#labNew").hidden=true}
+  setSaved(data.notes||data.board?"Progres dipulihkan":"Auto-Save aktif");
+  renderRombel();discOpen(user.rombel);rfOpen(user.rombel);abOpen(user.rombel);fbOpen(user.rombel);
+  if(AUTH&&user.role==="guru")cloudRoster(user.rombel);
+}
+function enter(u,fresh){
+  user=u;if(fresh)S.set("pf:session",u);if(CLOUD_URL&&u.token){AUTH={token:u.token,exp:u.exp,role:u.role,name:u.name,rombel:u.rombel};disc.db=cloudDb()}
+  $("#cover").hidden=true;$("#app").hidden=false;
+  loadData();abMark();window.scrollTo(0,0);
+}
+function switchRombel(r){if(user.role!=="guru"||r===user.rombel)return;saveNow();user.rombel=r;S.set("pf:session",user);loadData();toast("Rombel aktif: "+r)}
+$("#dTingkat").onchange=$("#dNomor").onchange=()=>switchRombel($("#dTingkat").value+"-"+$("#dNomor").value);
+$("#rbMap").onclick=e=>{const b=e.target.closest("[data-r]");if(b)switchRombel(b.dataset.r)};
+$("#impBtn").onclick=()=>{if(user.role!=="guru")return;const names=$("#impNames").value.split("\n").map(x=>x.trim()).filter(Boolean);if(!names.length)return;const r=user.rombel,L=rosterOf(r);let add=0;for(const x of names){if(L.length>=36){toast("Kapasitas 36 tercapai; sisa daftar diabaikan");break}if(!L.some(y=>y.toLowerCase()===x.toLowerCase())){L.push(x);add++}}S.set("pf:roster:"+r,L);if(AUTH)cloudCall("rosteradd",{rombel:r,names:L}).catch(()=>{});$("#impNames").value="";renderRombel();toast(add+" nama ditambahkan ke "+r)};
+$("#fSiswa").onsubmit=async e=>{e.preventDefault();const el=$("#lerr"),n=$("#sNama").value.trim();if(n.length<2){el.textContent="Isi nama lengkap terlebih dahulu.";return}if(blocked(el))return;const r=await doLogin("siswa",n,$("#sPass").value.trim(),cur(),el);if(!r)return;if(!r.token&&!register(r.name,r.rombel)){el.textContent="Rombel "+r.rombel+" sudah penuh (36/36). Hubungi guru.";return}fails=0;$("#sPass").value="";enter(Object.assign({role:"siswa"},r),true)};
+$("#fGuru").onsubmit=async e=>{e.preventDefault();const el=$("#lerr");if(blocked(el))return;const r=await doLogin("guru","Fadillah Zam Zam, S.Pd.",$("#gPass").value.trim(),cur(),el);if(!r)return;fails=0;$("#gPass").value="";enter(Object.assign({role:"guru"},r),true)};
+$("#logout").onclick=()=>{saveNow();S.del("pf:session");location.reload()};
+function showCover(){
+  saveNow();nlSaveNow();
+  $("#cvWho").textContent=(user.role==="guru"?"👨‍🏫 Guru":"🎒 Siswa")+" · Rombel "+user.rombel+(user.role==="siswa"?" · "+user.name:"");
+  $(".login").hidden=true;$("#cvResume").hidden=false;$("#cover").hidden=false;$("#app").hidden=true;window.scrollTo(0,0);
+}
+$("#homeBtn").onclick=showCover;
+$("#cvGo").onclick=()=>{$("#cover").hidden=true;$("#app").hidden=false;window.scrollTo(0,0)};
+$("#cvOut").onclick=()=>$("#logout").click();
+{const ss=S.get("pf:session");if(ss&&ss.name){if(CLOUD_URL&&!(ss.token&&ss.exp>Date.now())){S.del("pf:session")}else{ss.rombel=ss.rombel||"X-01";enter(ss)}}}
+</script>
+</body>
+</html>

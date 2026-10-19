@@ -534,7 +534,7 @@ const S={get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}
 let user=null,data={notes:"",board:"",lab:-1},st=null;
 const ukey=u=>"pf:d:"+u.role+":"+u.name.toLowerCase()+":"+u.rombel;
 const setSaved=t=>$("#saved").textContent="💾 "+t;
-const H={guru:"7633530d12139f51945ef848d5188a4a14f83cb842535b3deea00a52b747eb42",siswa:"4c298530ebecb9a83da4e7d3fa209769ebe1e31d6a2588f7c99d2df067855681"};
+const H={guru:"7633530d12139f5194const H={guru:"",siswa:""};
 function sha256js(msg){
   const b=new TextEncoder().encode(msg),L=b.length,N=(((L+8)>>6)+1)<<6,w=new Uint8Array(N);
   w.set(b);w[L]=128;const dv=new DataView(w.buffer);dv.setUint32(N-4,(L*8)>>>0);dv.setUint32(N-8,Math.floor(L*8/4294967296));
@@ -955,7 +955,7 @@ async function doLogin(role,name,pw,rombel,el){
       if(r.error==="full"){el.textContent="Rombel "+rombel+" sudah penuh (36/36). Hubungi guru.";return null}
       if(r.error==="config"){el.textContent="Server belum diatur: isi sandi di Properti skrip.";return null}
       el.textContent="Server menolak login ("+r.error+").";return null;
-    }catch(e){toast("Server tidak terjangkau. Memakai mode lokal.")}
+    }catch(e){toast("Server tidak     }catch(e){el.textContent="Server tidak terjangkau. Periksa internet lalu coba lagi.";return null}
   }
   if(await sha(pw)!==(role==="guru"?H.guru:H.siswa)){wrong(el);return null}
   return{name,rombel};

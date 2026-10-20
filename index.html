@@ -267,7 +267,7 @@ footer{text-align:center;color:var(--mut);font-size:.85rem;padding:28px 16px 36p
   <div class="tip" id="panel-translit-panduan">
     <div><span style="font-size:1.4rem">🌐</span>
       <div><h4>Tips Bahasa (Terjemahkan ke Bahasa Indonesia):</h4>
-      <p>Jika lab virtual berbahasa asing, <b>klik kanan</b> di dalam area lab dan pilih <b>“Terjemahkan ke Bahasa Indonesia”</b>. Di HP: menu <b>⋮</b> peramban → <b>Terjemahkan</b>.</p></div>
+      <p>Jika lab virtual berbahasa asing, klik <b>“Tab baru ↗”</b> pada lab tersebut. Di tab yang terbuka, klik ikon <b>Terjemahkan</b> di kanan kotak alamat (atau klik kanan → <b>Terjemahkan ke Bahasa Indonesia</b>), lalu pilih <b>Bahasa Indonesia</b>. Di HP: lab otomatis terbuka di tab baru; ketuk menu <b>⋮</b> peramban → <b>Terjemahkan</b>.</p></div>
     </div>
     <span class="tag">Otomatis Browser</span>
   </div>
@@ -387,8 +387,19 @@ footer{text-align:center;color:var(--mut);font-size:.85rem;padding:28px 16px 36p
 
 <section id="galeri">
   <h2>🗂️ Galeri Bukti Belajar</h2>
-  <p class="sub">Hasil tangkapan layar tampil di sini. Tekan lama (HP) atau klik kanan (komputer) pada gambar untuk menyimpan.</p>
-  <div class="gal" id="gal"><p class="empty" id="galEmpty">Belum ada tangkapan. Tekan “Tangkap Tampilan”.</p></div>
+  <p class="sub">Bukti aktivitas belajar-mengajar. Hasil tangkapan layar tampil di sini; <b>unggah ke portal</b> agar tercatat dan bisa diperiksa guru.</p>
+  <div class="panel" id="buPanel">
+    <div class="row" style="margin-top:0">
+      <input id="buKet" type="text" maxlength="120" placeholder="Keterangan (mis. Lab Hukum Ohm, kelompok 3)" aria-label="Keterangan bukti" style="flex:1 1 220px;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit">
+      <button class="btn" id="buPick" type="button">📤 Unggah Foto / Tangkapan Layar</button>
+      <input id="buFile" type="file" accept="image/*" multiple hidden>
+    </div>
+    <p class="sub" style="margin:0">💡 <b>Di HP:</b> ambil tangkapan layar dengan tombol bawaan HP (Power + Volume Bawah), lalu ketuk “Unggah” dan pilih gambarnya. <b>Di komputer:</b> tekan “Tangkap Tampilan”, lalu “📤 Unggah” pada gambar di bawah.</p>
+    <div id="buStat" role="status" aria-live="polite" style="margin-top:6px;font-weight:600"></div>
+  </div>
+  <div class="gal" id="gal" style="margin-top:12px"><p class="empty" id="galEmpty">Belum ada tangkapan. Tekan “Tangkap Tampilan”.</p></div>
+  <h3 style="margin:18px 0 6px">✅ Bukti terunggah <span class="badge" id="buBadge"></span></h3>
+  <div id="buList" class="panel"><p class="empty">Memuat…</p></div>
 </section>
 <section id="umpan" hidden>
   <h2>💌 Umpan Balik untuk Guru <span class="badge" id="fbBadge"></span></h2>
@@ -438,7 +449,8 @@ const QUIZ=[["🎮","Quizizz","https://quizizz.com/"],["📋","Google Forms (Bel
 const $=s=>document.querySelector(s);
 const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const link=(u,t,c="btn")=>`<a class="${c}" href="${u}" target="_blank" rel="noopener noreferrer">${t}</a>`;
-$("#labGrid").innerHTML=LABS.map((l,i)=>`<article class="card"><span class="ico">${l[0]}</span><h3>${i+1}. ${esc(l[1])}</h3><p>${esc(l[2])}</p><div class="row" style="margin:6px 0 0"><button class="btn" type="button" data-i="${i}">▶ Muat di Bingkai</button>${link(l[3],"Tab baru ↗","btn alt")}</div></article>`).join("");
+const PH=matchMedia("(max-width:700px)").matches;
+$("#labGrid").innerHTML=LABS.map((l,i)=>`<article class="card"><span class="ico">${l[0]}</span><h3>${i+1}. ${esc(l[1])}</h3><p>${esc(l[2])}</p><div class="row" style="margin:6px 0 0"><button class="btn" type="button" data-i="${i}">${PH?"↗ Buka Lab (tab baru)":"▶ Muat di Bingkai"}</button>${link(l[3],"Tab baru ↗","btn alt")}</div></article>`).join("");
 $("#aiGrid").innerHTML=AIS.map(a=>`<article class="card"><span class="ico">${a[0]}</span><h3>${esc(a[1])}</h3>${link(a[2],"Buka ↗")}</article>`).join("");
 $("#quizList").innerHTML=QUIZ.map(q=>link(q[2],`${q[0]} ${esc(q[1])}`,"btn alt")).join("");
 
@@ -508,8 +520,9 @@ let n=0;
 function addShot(url,label){
   n++;$("#galEmpty")?.remove();
   const f=document.createElement("figure"),t=new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});
-  f.innerHTML=`<img alt="${label} ${n}" src="${url}"><figcaption><span>${label} #${n} · ${t}</span><button class="btn alt" type="button">Hapus</button></figcaption>`;
-  f.querySelector("button").onclick=()=>{f.remove();if(!$("#gal figure"))$("#gal").innerHTML='<p class="empty" id="galEmpty">Belum ada tangkapan. Tekan “Tangkap Tampilan”.</p>'};
+  f.innerHTML=`<img alt="${label} ${n}" src="${url}"><figcaption><span>${label} #${n} · ${t}</span><span style="display:flex;gap:6px"><button class="btn" type="button" data-up>📤 Unggah</button><button class="btn alt" type="button" data-del>Hapus</button></span></figcaption>`;
+  f.querySelector("[data-up]").onclick=async e=>{const b=e.currentTarget;b.disabled=true;b.textContent="Mengunggah…";try{if(await buUnggah(url,label)){b.textContent="✅ Terunggah";buLoad();return}}catch(err){toast("Gagal mengunggah: "+buPesan(err))}b.disabled=false;b.textContent="📤 Unggah"};
+  f.querySelector("[data-del]").onclick=()=>{f.remove();if(!$("#gal figure"))$("#gal").innerHTML='<p class="empty" id="galEmpty">Belum ada tangkapan. Tekan “Tangkap Tampilan”.</p>'};
   $("#gal").prepend(f);
 }
 async function shoot(){
@@ -527,7 +540,7 @@ async function shoot(){
   }
   addShot(cv.toDataURL("image/png"),"Papan");toast("Papan ditangkap ke Galeri");
 }
-$("#shot").onclick=shoot;$("#shotLab").onclick=shoot;
+$("#shot").onclick=shoot;$("#shotLab").onclick=()=>{if(!navigator.mediaDevices?.getDisplayMedia){toast("Di HP: ambil tangkapan layar dengan tombol bawaan HP, lalu unggah di Galeri Bukti Belajar.");$("#galeri").scrollIntoView();return}shoot()};
 /* Penyimpanan, sesi, auto-save */
 const mem={};
 const S={get(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch(e){return mem[k]??null}},set(k,v){mem[k]=v;try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){return false}},del(k){delete mem[k];try{localStorage.removeItem(k)}catch(e){}}};
@@ -570,7 +583,7 @@ function openLab(i,quiet){
   $("#labTitle").textContent="🔬 "+l[1];const a=$("#labNew");a.href=l[3];a.hidden=false;
   if(!quiet){queueSave();$("#labPanel").scrollIntoView({behavior:"smooth"})}
 }
-$("#labGrid").onclick=e=>{const b=e.target.closest("[data-i]");if(b)openLab(+b.dataset.i)};
+$("#labGrid").onclick=e=>{const b=e.target.closest("[data-i]");if(!b)return;const i=+b.dataset.i;if(PH){const w=window.open(LABS[i][3],"_blank");if(w)try{w.opener=null}catch(x){}toast(w?"Lab dibuka di tab baru. Jika berbahasa asing, ketuk ikon Terjemahkan di browser.":"Pop-up diblokir. Ketuk tombol “Tab baru ↗”.");return}openLab(i)};
 
 /* Rekap nilai kuis (guru) */
 const nl={r:null,topik:"",kkm:75,rows:[]};let nlT=null,nlArm=null;
@@ -923,6 +936,75 @@ async function cloudCall(action,p){
   if(r&&r.error)throw new Error(r.error);
   return r;
 }
+
+/* ===== Bukti belajar: unggah ke server (Google Drive) ===== */
+const bu={list:[]};
+function buOK(){return !!(CLOUD_URL&&AUTH&&AUTH.token)}
+function buPesan(e){const m=String(e&&e.message||e);return({format:"format gambar tidak didukung",ukuran:"gambar terlalu besar",batas:"batas unggahan harian tercapai (30)",sibuk:"server sibuk, coba lagi",gambar:"gambar tidak bisa dibaca",auth:"sesi berakhir"})[m]||m}
+function buJpeg(src){
+  return new Promise((ok,no)=>{
+    const im=new Image();let u=null;
+    im.onload=()=>{
+      const M=1280,k=Math.min(1,M/Math.max(im.width,im.height)),c=document.createElement("canvas");
+      c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));
+      const x=c.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,c.width,c.height);x.drawImage(im,0,0,c.width,c.height);
+      if(u)URL.revokeObjectURL(u);
+      ok(c.toDataURL("image/jpeg",.72).split(",")[1]);
+    };
+    im.onerror=()=>{if(u)URL.revokeObjectURL(u);no(new Error("gambar"))};
+    if(typeof src==="string")im.src=src;else{u=URL.createObjectURL(src);im.src=u}
+  });
+}
+async function buUnggah(src,label){
+  if(!user){toast("Login dulu.");return false}
+  if(!buOK()){toast("Unggah butuh sambungan server. Periksa internet lalu login ulang.");return false}
+  const p={mime:"image/jpeg",b64:await buJpeg(src),ket:(($("#buKet").value||"").trim()||label||"")};
+  if(user.role==="guru")p.rombel=user.rombel;
+  try{await cloudCall("bukti_up",p)}
+  catch(e){if(String(e.message)==="sibuk"){await new Promise(r=>setTimeout(r,1500));await cloudCall("bukti_up",p)}else throw e}
+  return true;
+}
+async function buLoad(){
+  const box=$("#buList");
+  if(!user)return;
+  if(!buOK()){box.innerHTML='<p class="empty">Daftar bukti tampil setelah tersambung ke server.</p>';$("#buBadge").textContent="";return}
+  try{
+    const r=await cloudCall("bukti_list",user.role==="guru"?{rombel:user.rombel}:{});
+    bu.list=(r.rows||[]).sort((a,b)=>b.ts-a.ts);buRender();
+  }catch(e){box.innerHTML='<p class="empty">Gagal memuat daftar bukti.</p>'}
+}
+function buRender(){
+  const box=$("#buList"),g=user&&user.role==="guru",L=bu.list;
+  $("#buBadge").textContent=L.length+" berkas";
+  if(!L.length){box.innerHTML='<p class="empty">'+(g?"Belum ada bukti di rombel ini.":"Belum ada bukti yang kamu unggah.")+"</p>";return}
+  box.innerHTML=L.slice(0,80).map(d=>{
+    const t=new Date(d.ts).toLocaleString("id-ID",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
+    return `<div class="bu" data-id="${esc(d.id)}" style="padding:8px 0;border-top:1px solid var(--line)"><div class="row" style="margin:0"><span>🖼️ <b>${esc(d.name)}</b>${d.role==="guru"?" (guru)":""} · ${t}${d.ket?" · "+esc(d.ket):""}</span><button class="btn alt" type="button" data-v>Lihat</button>${d.url?`<a class="btn alt" href="${esc(d.url)}" target="_blank" rel="noopener">Buka di Drive ↗</a>`:""}</div><img class="buImg" alt="Bukti belajar ${esc(d.name)}" hidden style="max-width:100%;max-height:360px;margin-top:8px;border-radius:8px"></div>`}).join("")+(L.length>80?'<p class="empty">Menampilkan 80 terbaru dari '+L.length+".</p>":"");
+}
+document.addEventListener("click",async e=>{
+  const b=e.target.closest("#buList [data-v]");if(!b)return;
+  const row=b.closest(".bu"),im=row.querySelector(".buImg");
+  if(!im.hidden){im.hidden=true;b.textContent="Lihat";return}
+  if(!im.src||im.src===location.href){
+    b.disabled=true;b.textContent="Memuat…";
+    try{const r=await cloudCall("bukti_img",Object.assign({id:row.dataset.id},user.role==="guru"?{rombel:user.rombel}:{}));im.src=r.dataUrl}
+    catch(err){toast("Gagal memuat gambar: "+buPesan(err));b.disabled=false;b.textContent="Lihat";return}
+    b.disabled=false;
+  }
+  im.hidden=false;b.textContent="Sembunyikan";
+});
+$("#buPick").onclick=()=>$("#buFile").click();
+$("#buFile").onchange=async e=>{
+  const fs=[...e.target.files];e.target.value="";if(!fs.length||bu.busy)return;
+  bu.busy=true;let ok=0,gagal="";
+  for(let i=0;i<fs.length;i++){
+    $("#buStat").textContent="⏳ Mengunggah "+(i+1)+" dari "+fs.length+"…";
+    try{if(await buUnggah(fs[i],"Foto"))ok++}catch(err){gagal=buPesan(err)}
+  }
+  bu.busy=false;
+  $("#buStat").textContent=(ok?"✅ "+ok+" bukti terunggah. ":"")+(gagal?"⚠️ Gagal: "+gagal:"");
+  if(ok){toast("Bukti belajar terunggah");$("#buKet").value="";buLoad()}
+};
 function cloudDb(){
   const subs=[],parse=p=>{const a=p.split("/");return{table:a[0],rombel:a[1]}};
   const snap=rows=>({docs:rows.map(x=>({id:x.id,exists:true,data:()=>x.data}))});
@@ -994,7 +1076,7 @@ function loadData(){
   if(data.board){const im=new Image();im.onload=()=>ctx.drawImage(im,0,0,cv.width,cv.height);im.src=data.board}
   if(data.lab>=0)openLab(data.lab,true);else{$("#labFrame").innerHTML="<span>🔬 Bingkai lab virtual akan tampil di sini.</span>";$("#labTitle").textContent="Pilih salah satu lab di atas";$("#labNew").hidden=true}
   setSaved(data.notes||data.board?"Progres dipulihkan":"Auto-Save aktif");
-  renderRombel();discOpen(user.rombel);rfOpen(user.rombel);abOpen(user.rombel);fbOpen(user.rombel);
+  renderRombel();discOpen(user.rombel);rfOpen(user.rombel);abOpen(user.rombel);fbOpen(user.rombel);buLoad();
   if(AUTH&&user.role==="guru")cloudRoster(user.rombel);
 }
 function enter(u,fresh){

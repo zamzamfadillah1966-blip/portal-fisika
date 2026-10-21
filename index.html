@@ -169,7 +169,7 @@ dialog::backdrop{background:rgba(0,0,0,.7)}
 .tabs{display:flex;gap:6px;margin-bottom:12px}.tabs .btn{flex:1}
 .login form{display:grid;gap:8px}
 .lerr{color:#dc2626;font-size:.85rem;min-height:1.1em;margin:6px 0 0}
-.player.lab{aspect-ratio:16/10;min-height:340px}
+.player.lab{aspect-ratio:16/10;min-height:340px;width:100%;max-width:100%}
 .sub b,label b{color:var(--ink)}
 footer{text-align:center;color:var(--mut);font-size:.85rem;padding:28px 16px 36px}
 #toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:#111;color:#fff;padding:10px 16px;border-radius:10px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .25s}
@@ -181,7 +181,7 @@ footer{text-align:center;color:var(--mut);font-size:.85rem;padding:28px 16px 36p
   <h1>BELAJAR BERMAKNA MELALUI PORTAL GURU FISIKA</h1>
   <p class="pillars">✦ <i style="color:#fcd34d">Joyful Learning</i> • <i style="color:#7dd3fc">Mindful Learning</i> • <i style="color:#86efac">Meaningful Learning</i> ✦</p>
   <div class="pwrap"><div class="photo" id="photoBox" role="img" aria-label="Logo FZ">FZ</div></div>
-  <p class="fine">🟢 <b>Auto-Save Aktif:</b> progres, catatan, dan sesi tersimpan otomatis di perangkat ini.</p>
+  <p class="fine"><b>NEXUS - CLE</b> : Serverless Activity - Based LMS &amp; Content Curator Platform</p>
   <div id="cvResume" hidden><p id="cvWho" style="margin:0 0 12px;color:#e0e7ff"></p><div class="row" style="justify-content:center;margin:0 0 4px"><button class="btn" id="cvGo" type="button">▶ Lanjut ke Portal</button><button class="btn warn" id="cvOut" type="button">🚪 Logout</button></div></div>
   <div class="login">
     <div class="row2"><label class="sel">Tingkat<select class="in" id="cTingkat"></select></label><label class="sel">Nomor Rombel<select class="in" id="cNomor"></select></label></div>
@@ -940,7 +940,7 @@ async function cloudCall(action,p){
 /* ===== Bukti belajar: unggah ke server (Google Drive) ===== */
 const bu={list:[]};
 function buOK(){return !!(CLOUD_URL&&AUTH&&AUTH.token)}
-function buPesan(e){const m=String(e&&e.message||e);return({format:"format gambar tidak didukung",ukuran:"gambar terlalu besar",batas:"batas unggahan harian tercapai (30)",sibuk:"server sibuk, coba lagi",gambar:"gambar tidak bisa dibaca",auth:"sesi berakhir"})[m]||m}
+function buPesan(e){const m=String(e&&e.message||e);return({format:"format gambar tidak didukung",ukuran:"gambar terlalu besar",batas:"batas unggahan harian tercapai (30)",sibuk:"server sibuk, coba lagi",gambar:"gambar tidak bisa dibaca",auth:"sesi berakhir",nilai:"nilai harus 0-100",forbidden:"hanya guru yang bisa menilai","bukan siswa":"bukti guru tidak dinilai","tidak ada":"bukti tidak ditemukan"})[m]||m}
 function buJpeg(src){
   return new Promise((ok,no)=>{
     const im=new Image();let u=null;
@@ -973,25 +973,53 @@ async function buLoad(){
     bu.list=(r.rows||[]).sort((a,b)=>b.ts-a.ts);buRender();
   }catch(e){box.innerHTML='<p class="empty">Gagal memuat daftar bukti.</p>'}
 }
+function buChip(d){return d.nilai==null
+  ?'<span class="badge buChip" style="background:#fef3c7;color:#92400e">Belum dinilai</span>'
+  :'<span class="badge buChip" style="background:#dcfce7;color:#166534">⭐ Nilai '+esc(String(d.nilai))+'</span>'}
+function buCat(d){return d.catatan?'📝 Catatan guru: '+esc(d.catatan):""}
+function buCount(){
+  const g=user&&user.role==="guru",L=bu.list;
+  $("#buBadge").textContent=L.length+" berkas"+(g?" · "+L.filter(x=>x.role!=="guru"&&x.nilai!=null).length+" dinilai":"");
+}
 function buRender(){
   const box=$("#buList"),g=user&&user.role==="guru",L=bu.list;
-  $("#buBadge").textContent=L.length+" berkas";
+  buCount();
   if(!L.length){box.innerHTML='<p class="empty">'+(g?"Belum ada bukti di rombel ini.":"Belum ada bukti yang kamu unggah.")+"</p>";return}
   box.innerHTML=L.slice(0,80).map(d=>{
     const t=new Date(d.ts).toLocaleString("id-ID",{day:"2-digit",month:"short",hour:"2-digit",minute:"2-digit"});
-    return `<div class="bu" data-id="${esc(d.id)}" style="padding:8px 0;border-top:1px solid var(--line)"><div class="row" style="margin:0"><span>🖼️ <b>${esc(d.name)}</b>${d.role==="guru"?" (guru)":""} · ${t}${d.ket?" · "+esc(d.ket):""}</span><button class="btn alt" type="button" data-v>Lihat</button>${d.url?`<a class="btn alt" href="${esc(d.url)}" target="_blank" rel="noopener">Buka di Drive ↗</a>`:""}</div><img class="buImg" alt="Bukti belajar ${esc(d.name)}" hidden style="max-width:100%;max-height:360px;margin-top:8px;border-radius:8px"></div>`}).join("")+(L.length>80?'<p class="empty">Menampilkan 80 terbaru dari '+L.length+".</p>":"");
+    const nilai=d.role==="guru"?"":" "+buChip(d);
+    const form=(g&&d.role!=="guru")?`<div class="buNil" hidden style="margin-top:8px"><div class="row" style="margin:0"><label>Nilai (0-100) <input type="number" class="buN" min="0" max="100" step="1" inputmode="decimal" value="${d.nilai==null?"":esc(String(d.nilai))}" style="width:90px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit"></label><input type="text" class="buC" maxlength="300" placeholder="Catatan untuk siswa (opsional)" value="${esc(d.catatan||"")}" style="flex:1 1 200px;min-width:0;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit"><button class="btn" type="button" data-sv>💾 Simpan nilai</button></div><div class="buNs" role="status" aria-live="polite" style="margin-top:4px;font-weight:600"></div></div>`:"";
+    return `<div class="bu" data-id="${esc(d.id)}" style="padding:8px 0;border-top:1px solid var(--line)"><div class="row" style="margin:0"><span>🖼️ <b>${esc(d.name)}</b>${d.role==="guru"?" (guru)":""} · ${t}${d.ket?" · "+esc(d.ket):""}${nilai}</span><button class="btn alt" type="button" data-v>${g&&d.role!=="guru"?"Lihat &amp; Nilai":"Lihat"}</button>${d.url?`<a class="btn alt" href="${esc(d.url)}" target="_blank" rel="noopener">Buka di Drive ↗</a>`:""}</div><div class="sub buCat" style="margin:4px 0 0"${d.catatan?"":" hidden"}>${buCat(d)}</div><img class="buImg" alt="Bukti belajar ${esc(d.name)}" hidden style="max-width:100%;max-height:360px;margin-top:8px;border-radius:8px">${form}</div>`}).join("")+(L.length>80?'<p class="empty">Menampilkan 80 terbaru dari '+L.length+".</p>":"");
 }
 document.addEventListener("click",async e=>{
   const b=e.target.closest("#buList [data-v]");if(!b)return;
   const row=b.closest(".bu"),im=row.querySelector(".buImg");
-  if(!im.hidden){im.hidden=true;b.textContent="Lihat";return}
+  const lbl=b.dataset.l||(b.dataset.l=b.textContent),fm=row.querySelector(".buNil");
+  if(!im.hidden){im.hidden=true;if(fm)fm.hidden=true;b.innerHTML=lbl;return}
   if(!im.src||im.src===location.href){
     b.disabled=true;b.textContent="Memuat…";
     try{const r=await cloudCall("bukti_img",Object.assign({id:row.dataset.id},user.role==="guru"?{rombel:user.rombel}:{}));im.src=r.dataUrl}
-    catch(err){toast("Gagal memuat gambar: "+buPesan(err));b.disabled=false;b.textContent="Lihat";return}
+    catch(err){toast("Gagal memuat gambar: "+buPesan(err));b.disabled=false;b.innerHTML=lbl;return}
     b.disabled=false;
   }
-  im.hidden=false;b.textContent="Sembunyikan";
+  im.hidden=false;if(fm)fm.hidden=false;b.textContent="Sembunyikan";
+});
+document.addEventListener("click",async e=>{
+  const b=e.target.closest("#buList [data-sv]");if(!b)return;
+  const row=b.closest(".bu"),n=row.querySelector(".buN").value.trim(),c=row.querySelector(".buC").value,s=row.querySelector(".buNs");
+  if(n!==""&&(isNaN(+n)||+n<0||+n>100)){s.textContent="⚠️ Nilai harus 0-100.";return}
+  b.disabled=true;s.textContent="⏳ Menyimpan…";
+  try{
+    const r=await cloudCall("bukti_nilai",{rombel:user.rombel,id:row.dataset.id,nilai:n,catatan:c});
+    const it=bu.list.find(x=>x.id===row.dataset.id);
+    if(it){it.nilai=r.nilai;it.catatan=r.catatan}
+    row.querySelector(".buChip").outerHTML=buChip(it);
+    const ct=row.querySelector(".buCat");ct.innerHTML=buCat(it);ct.hidden=!it.catatan;
+    row.querySelector(".buN").value=it.nilai==null?"":it.nilai;row.querySelector(".buC").value=it.catatan||"";
+    buCount();
+    s.textContent=it.nilai==null?"✅ Nilai dihapus.":"✅ Tersimpan ke tab NilaiBukti di Google Sheet.";
+  }catch(err){s.textContent="⚠️ Gagal menyimpan: "+buPesan(err)}
+  b.disabled=false;
 });
 $("#buPick").onclick=()=>$("#buFile").click();
 $("#buFile").onchange=async e=>{

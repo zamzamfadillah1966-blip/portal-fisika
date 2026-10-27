@@ -44,7 +44,7 @@ h2{margin:0 0 4px;font-size:1.35rem}
 .tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
 .sw{width:30px;height:30px;border-radius:50%;border:3px solid var(--line);cursor:pointer;padding:0}
 .sw.on{border-color:var(--ink)}
-canvas{width:100%;height:auto;aspect-ratio:2/1;background:#fff;border:1px solid var(--line);border-radius:10px;touch-action:none;cursor:crosshair;display:block}
+canvas{width:100%;height:auto;aspect-ratio:4/3;background:#fff;border:1px solid var(--line);border-radius:10px;touch-action:none;cursor:crosshair;display:block}
 .quiz{display:grid;gap:8px}
 .quiz .btn{justify-content:flex-start}
 .gal{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
@@ -328,18 +328,34 @@ footer{text-align:center;color:var(--mut);font-size:.85rem;padding:28px 16px 36p
 
 <section id="papan">
   <h2>🖍️ Papan Digital Interaktif</h2>
-  <p class="sub">Tulis rumus, gambar vektor, atau diagram benda bebas. Gunakan layar sentuh, mouse, atau stylus.</p>
+  <p class="sub">Satu murid punya sampai 5 kartu. Tulis rumus, gambar diagram benda bebas, atau beri tanda pada foto/tangkapan layar lab, lalu <b>kirim ke guru</b>. Gunakan jari, stylus, atau mouse.</p>
   <div class="board">
     <div class="panel">
+      <div class="row" id="cardTabs" style="margin:0 0 8px;gap:6px"></div>
+      <div class="tools" id="toolRow"></div>
       <div class="tools">
         <span id="swatches" style="display:flex;gap:6px"></span>
         <input type="color" id="picker" value="#1d4ed8" aria-label="Pilih warna" style="width:38px;height:34px;border:0;background:none;padding:0">
         <label style="font-size:.85rem">Tebal <input type="range" id="size" min="1" max="24" value="4"></label>
         <button class="btn alt" id="eraser" type="button">🧽 Penghapus</button>
-        <button class="btn warn" id="clear" type="button">🗑️ Bersihkan</button><button class="btn alt" id="undo" type="button">↩️ Urungkan</button>
+        <button class="btn alt" id="undo" type="button" disabled>↩️ Urungkan</button>
+        <button class="btn alt" id="redo" type="button" disabled>↪️ Ulangi</button>
+        <button class="btn warn" id="clear" type="button">🗑️ Bersihkan</button>
+      </div>
+      <div class="tools">
+        <label style="font-size:.85rem">Latar
+          <select id="bgSel" class="in" style="width:auto;padding:6px 8px" aria-label="Latar kartu"><option value="putih">Putih</option><option value="petak">Berpetak</option><option value="grafik">Grafik</option><option value="foto" disabled>Foto</option></select></label>
+        <button class="btn alt" id="bgPick" type="button">🖼️ Foto / Tangkapan Layar sebagai Latar</button>
+        <input type="file" id="bgFile" accept="image/*" hidden>
         <button class="btn acc" id="shot" type="button">📸 Tangkap Tampilan</button>
       </div>
-      <canvas id="cv" width="1200" height="600"></canvas>
+      <canvas id="cv" width="1200" height="900"></canvas>
+      <div class="row" style="margin:8px 0 0">
+        <input id="cardKet" type="text" maxlength="100" placeholder="Judul kartu (mis. Diagram gaya, Lab Hukum Ohm)" aria-label="Judul kartu" style="flex:1 1 200px;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit">
+        <button class="btn" id="sendCard" type="button">📤 Kirim ke Guru</button>
+        <button class="btn alt" id="savePng" type="button">⬇ Simpan Gambar</button>
+      </div>
+      <div id="cardStat" role="status" aria-live="polite" style="margin-top:6px;font-weight:600"></div>
     </div>
     <div class="panel">
       <h3 style="margin:0 0 4px">✅ Kuis Penutup KBM</h3>
@@ -473,25 +489,167 @@ $("#quizList").innerHTML=QUIZ.map(q=>link(q[2],`${q[0]} ${esc(q[1])}`,"btn alt")
 function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove("show"),2600)}
 $("#themeBtn").onclick=()=>{const r=document.documentElement,d=getComputedStyle(r).getPropertyValue("--bg").trim()==="#0d1424";r.dataset.theme=d?"light":"dark"};
 
-/* Papan digital */
+/* Papan digital: banyak kartu, alat gambar, latar, undo/ulangi, kirim ke guru */
 const cv=$("#cv"),ctx=cv.getContext("2d");
-let color="#1d4ed8",erase=false,drawing=false,last=null;
-function fill(){ctx.fillStyle="#fff";ctx.fillRect(0,0,cv.width,cv.height)}
-fill();
+const BW=cv.width,BH=cv.height,MAXK=5,MAXH=12;
+let color="#1d4ed8",erase=false,drawing=false,last=null,tool="pen";
+const bgCv=document.createElement("canvas");bgCv.width=BW;bgCv.height=BH;
+let erPat=null;
+function makeBg(type,im){
+  const x=bgCv.getContext("2d");x.fillStyle="#fff";x.fillRect(0,0,BW,BH);
+  if(type==="petak"||type==="grafik"){
+    const mn=type==="petak"?30:20,mj=type==="grafik"?100:0;
+    x.lineWidth=1;x.strokeStyle=type==="petak"?"#d5deec":"#e3e9f4";x.beginPath();
+    for(let i=mn;i<BW;i+=mn){x.moveTo(i+.5,0);x.lineTo(i+.5,BH)}
+    for(let j=mn;j<BH;j+=mn){x.moveTo(0,j+.5);x.lineTo(BW,j+.5)}
+    x.stroke();
+    if(mj){x.strokeStyle="#aebbd3";x.beginPath();for(let i=mj;i<BW;i+=mj){x.moveTo(i+.5,0);x.lineTo(i+.5,BH)}for(let j=mj;j<BH;j+=mj){x.moveTo(0,j+.5);x.lineTo(BW,j+.5)}x.stroke()}
+  }else if(type==="foto"&&im){
+    const k=Math.min(BW/im.width,BH/im.height),w=im.width*k,h=im.height*k;x.drawImage(im,(BW-w)/2,(BH-h)/2,w,h);
+  }
+  erPat=null;
+}
+function fill(){ctx.drawImage(bgCv,0,0)}
+makeBg("putih");fill();
 const COLORS=["#111111","#1d4ed8","#dc2626","#16a34a","#f59e0b"];
 const sw=$("#swatches");
 COLORS.forEach((c,i)=>{const b=document.createElement("button");b.type="button";b.className="sw"+(i===1?" on":"");b.style.background=c;b.setAttribute("aria-label","Warna "+c);b.onclick=()=>setColor(c);sw.appendChild(b)});
-function setColor(c){color=c;erase=false;$("#picker").value=c;$("#eraser").classList.remove("acc");[...sw.children].forEach((b,i)=>b.classList.toggle("on",COLORS[i]===c))}
+function setColor(c){color=c;if(tool==="eraser")setTool("pen");$("#picker").value=c;[...sw.children].forEach((b,i)=>b.classList.toggle("on",COLORS[i]===c))}
 $("#picker").oninput=e=>setColor(e.target.value);
-$("#eraser").onclick=e=>{erase=!erase;e.currentTarget.classList.toggle("acc",erase)};
-let prev=null;
-$("#clear").onclick=()=>{prev=cv.toDataURL();fill();queueSave();toast("Papan dibersihkan (bisa diurungkan)")};
-$("#undo").onclick=()=>{if(!prev)return;const im=new Image();im.onload=()=>{ctx.drawImage(im,0,0);queueSave()};im.src=prev;prev=null};
+const TOOLS=[["pen","✏️ Pena"],["hl","🖍️ Stabilo"],["line","╱ Garis"],["arrow","➚ Panah"],["rect","▭ Kotak"],["circle","◯ Lingkaran"],["text","🔤 Teks"]];
+TOOLS.forEach(t=>{const b=document.createElement("button");b.type="button";b.dataset.t=t[0];b.textContent=t[1];b.onclick=()=>setTool(t[0]);$("#toolRow").appendChild(b)});
+function setTool(t){tool=t;erase=(t==="eraser");[...$("#toolRow").children].forEach(b=>b.className="btn "+(b.dataset.t===t?"acc":"alt"));$("#eraser").className="btn "+(erase?"acc":"alt")}
+setTool("pen");
+$("#eraser").onclick=()=>setTool(tool==="eraser"?"pen":"eraser");
+function erasePat(){return erPat||(erPat=ctx.createPattern(bgCv,"no-repeat"))}
 const pos=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*cv.width/r.width,y:(e.clientY-r.top)*cv.height/r.height}};
-function line(a,b){ctx.strokeStyle=erase?"#fff":color;ctx.lineWidth=erase?$("#size").value*3:$("#size").value;ctx.lineCap=ctx.lineJoin="round";ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}
-cv.addEventListener("pointerdown",e=>{drawing=true;cv.setPointerCapture(e.pointerId);last=pos(e);line(last,{x:last.x+.01,y:last.y})});
-cv.addEventListener("pointermove",e=>{if(!drawing)return;const p=pos(e);line(last,p);last=p});
-["pointerup","pointercancel","pointerleave"].forEach(ev=>cv.addEventListener(ev,()=>drawing=false));
+function line(a,b){ctx.strokeStyle=erase?erasePat():color;ctx.lineWidth=erase?$("#size").value*3:$("#size").value;ctx.lineCap=ctx.lineJoin="round";ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke()}
+function drawShape(t,a,b){
+  ctx.strokeStyle=color;ctx.lineWidth=$("#size").value;ctx.lineCap=ctx.lineJoin="round";ctx.beginPath();
+  if(t==="rect"){ctx.rect(Math.min(a.x,b.x),Math.min(a.y,b.y),Math.abs(b.x-a.x),Math.abs(b.y-a.y))}
+  else if(t==="circle"){ctx.ellipse((a.x+b.x)/2,(a.y+b.y)/2,Math.abs(b.x-a.x)/2||.5,Math.abs(b.y-a.y)/2||.5,0,0,Math.PI*2)}
+  else{
+    ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);
+    if(t==="arrow"){const g=Math.atan2(b.y-a.y,b.x-a.x),L=Math.max(14,$("#size").value*4);
+      ctx.moveTo(b.x,b.y);ctx.lineTo(b.x-L*Math.cos(g-.45),b.y-L*Math.sin(g-.45));
+      ctx.moveTo(b.x,b.y);ctx.lineTo(b.x-L*Math.cos(g+.45),b.y-L*Math.sin(g+.45))}
+  }
+  ctx.stroke();
+}
+function drawHl(p){
+  ctx.save();ctx.globalAlpha=.35;ctx.strokeStyle=color;ctx.lineWidth=$("#size").value*3;ctx.lineCap=ctx.lineJoin="round";
+  ctx.beginPath();ctx.moveTo(p[0].x,p[0].y);for(let i=1;i<p.length;i++)ctx.lineTo(p[i].x,p[i].y);if(p.length===1)ctx.lineTo(p[0].x+.01,p[0].y);
+  ctx.stroke();ctx.restore();
+}
+function addText(p){
+  const t=prompt("Tulis teks (rumus atau keterangan):");if(!t)return;
+  const z=+$("#size").value;ctx.fillStyle=color;ctx.font="bold "+Math.max(18,z*5)+"px sans-serif";ctx.textBaseline="top";
+  t.split("\n").forEach((s2,i)=>ctx.fillText(s2.slice(0,200),p.x,p.y+i*Math.max(22,z*6)));
+  pushHist();queueSave();
+}
+let base=null,start=null,path=[];
+cv.addEventListener("pointerdown",e=>{
+  if(e.isPrimary===false||(e.pointerType==="mouse"&&e.button!==0))return;
+  const p=pos(e);
+  if(tool==="text"){e.preventDefault();addText(p);return}
+  drawing=true;try{cv.setPointerCapture(e.pointerId)}catch(x){}
+  start=p;last=p;path=[p];
+  if(tool==="pen"||tool==="eraser"){line(p,{x:p.x+.01,y:p.y})}
+  else{try{base=ctx.getImageData(0,0,BW,BH)}catch(x){base=null;drawing=false}}
+});
+cv.addEventListener("pointermove",e=>{
+  if(!drawing)return;const p=pos(e);
+  if(tool==="pen"||tool==="eraser"){line(last,p);last=p;return}
+  if(!base)return;
+  if(tool==="hl"){const q=path[path.length-1];if(Math.hypot(p.x-q.x,p.y-q.y)<2)return;path.push(p);ctx.putImageData(base,0,0);drawHl(path)}
+  else{ctx.putImageData(base,0,0);drawShape(tool,start,p)}
+});
+function endStroke(){if(!drawing)return;drawing=false;if(base&&tool==="hl")drawHl(path);base=null;pushHist();queueSave()}
+["pointerup","pointercancel","pointerleave"].forEach(ev=>cv.addEventListener(ev,endStroke));
+
+/* Riwayat (urungkan/ulangi) */
+let hist=[],hi=-1,showTok=0,cards=[],kc=0;
+function snap(){try{return cards[kc]&&cards[kc].bg==="foto"?cv.toDataURL("image/jpeg",.92):cv.toDataURL("image/png")}catch(e){return ""}}
+function updUndo(){$("#undo").disabled=hi<=0;$("#redo").disabled=hi>=hist.length-1}
+function pushHist(){const s2=snap();if(!s2)return;if(hi<hist.length-1)hist.length=hi+1;hist.push(s2);if(hist.length>MAXH)hist.shift();hi=hist.length-1;updUndo()}
+function restore(url){const im=new Image();im.onload=()=>{ctx.drawImage(im,0,0,BW,BH);queueSave()};im.src=url}
+$("#undo").onclick=()=>{if(hi<=0)return;hi--;restore(hist[hi]);updUndo()};
+$("#redo").onclick=()=>{if(hi>=hist.length-1)return;hi++;restore(hist[hi]);updUndo()};
+$("#clear").onclick=()=>{fill();pushHist();queueSave();toast("Kartu dibersihkan (bisa diurungkan)")};
+
+/* Kartu (maks. 5 per murid) */
+function newCard(){return{img:"",bg:"putih",bgImg:""}}
+function cardCommit(){if(cards[kc])try{cards[kc].img=cv.toDataURL("image/jpeg",.75)}catch(e){}}
+function cardsStore(){cardCommit();data.cards=cards.map(c=>({img:c.img,bg:c.bg,bgImg:c.bg==="foto"?c.bgImg:""}));data.kc=kc;data.board=""}
+function renderTabs(){
+  const bx=$("#cardTabs");bx.innerHTML="";
+  cards.forEach((c,i)=>{const t=document.createElement("button");t.type="button";t.className="btn "+(i===kc?"acc":"alt");t.textContent="Kartu "+(i+1);t.onclick=()=>cardShow(i);bx.appendChild(t)});
+  if(cards.length<MAXK){const a=document.createElement("button");a.type="button";a.className="btn";a.textContent="＋ Kartu";a.onclick=cardAdd;bx.appendChild(a)}
+  const d=document.createElement("button");d.type="button";d.className="btn warn";d.textContent="🗑 Hapus kartu";d.onclick=cardDel;bx.appendChild(d);
+  $("#bgSel").value=cards[kc].bg;
+}
+function cardShow(i,skip){
+  if(!skip)cardCommit();
+  kc=i;const c=cards[i],tok=++showTok;
+  makeBg(c.bg);
+  if(c.bg==="foto"&&c.bgImg){const bi=new Image();bi.onload=()=>{if(tok===showTok)makeBg("foto",bi)};bi.src=c.bgImg}
+  fill();hist=[];hi=-1;renderTabs();updUndo();
+  if(c.img){const im=new Image();im.onload=()=>{if(tok!==showTok)return;ctx.drawImage(im,0,0,BW,BH);pushHist()};im.onerror=()=>{if(tok===showTok)pushHist()};im.src=c.img}
+  else pushHist();
+}
+function cardAdd(){if(cards.length>=MAXK){toast("Maksimal "+MAXK+" kartu");return}cardCommit();cards.push(newCard());cardShow(cards.length-1,true);queueSave()}
+function cardDel(){
+  if(cards.length===1){if(confirm("Bersihkan kartu ini?")){cards[0]=newCard();cardShow(0,true);queueSave()}return}
+  if(!confirm("Hapus Kartu "+(kc+1)+"?"))return;
+  cards.splice(kc,1);kc=Math.min(kc,cards.length-1);cardShow(kc,true);queueSave();
+}
+function cardsLoad(){
+  const dc=Array.isArray(data.cards)&&data.cards.length?data.cards:null;
+  cards=dc?dc.slice(0,MAXK).map(c=>({img:String(c&&c.img||""),bg:["putih","petak","grafik","foto"].indexOf(c&&c.bg)>=0?c.bg:"putih",bgImg:String(c&&c.bgImg||"")})):[Object.assign(newCard(),{img:data.board||""})];
+  kc=Math.min(Math.max(0,+data.kc||0),cards.length-1);
+  cardShow(kc,true);
+  $("#sendCard").textContent=user&&user.role==="guru"?"📤 Simpan ke Galeri Bukti":"📤 Kirim ke Guru";
+  $("#cardKet").value="";$("#cardStat").textContent="";
+}
+$("#bgSel").onchange=e=>{
+  const v=e.target.value,c=cards[kc];
+  if(hi>0&&!confirm("Ganti latar akan menghapus coretan di kartu ini. Lanjutkan?")){e.target.value=c.bg;return}
+  c.bg=v;c.bgImg="";c.img="";cardShow(kc,true);queueSave();
+};
+$("#bgPick").onclick=()=>$("#bgFile").click();
+$("#bgFile").onchange=e=>{
+  const f=e.target.files[0];e.target.value="";if(!f)return;
+  if(hi>0&&!confirm("Foto latar akan menghapus coretan di kartu ini. Lanjutkan?"))return;
+  const u=URL.createObjectURL(f),im=new Image();
+  im.onload=()=>{
+    URL.revokeObjectURL(u);const c=cards[kc];makeBg("foto",im);c.bg="foto";
+    try{c.bgImg=bgCv.toDataURL("image/jpeg",.7)}catch(x){c.bgImg=""}
+    c.img="";fill();hist=[];hi=-1;pushHist();renderTabs();queueSave();
+  };
+  im.onerror=()=>{URL.revokeObjectURL(u);toast("Foto tidak bisa dibaca")};
+  im.src=u;
+};
+function isBlank(){
+  try{
+    const a=ctx.getImageData(0,0,BW,BH).data,b=bgCv.getContext("2d").getImageData(0,0,BW,BH).data;let n=0;
+    for(let i=0;i<a.length;i+=4){if(Math.abs(a[i]-b[i])>24||Math.abs(a[i+1]-b[i+1])>24||Math.abs(a[i+2]-b[i+2])>24){if(++n>200)return false}}
+    return true;
+  }catch(e){return false}
+}
+$("#sendCard").onclick=async()=>{
+  const b=$("#sendCard"),stt=$("#cardStat");
+  if(!user){toast("Login dulu.");return}
+  if(isBlank()){toast("Kartu masih kosong. Gambar atau tulis dulu.");return}
+  cardCommit();b.disabled=true;const old=b.textContent;b.textContent="Mengirim…";stt.textContent="";
+  const ket="Kartu · "+(($("#cardKet").value||"").trim()||"Kartu "+(kc+1));
+  try{
+    const ok=await buUnggah(cv.toDataURL("image/jpeg",.85),"Kartu",ket);
+    if(ok){stt.textContent="✅ Terkirim ke "+(user.role==="guru"?"Galeri Bukti":"guru")+" pukul "+new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"});toast("Kartu terkirim ✅");buLoad()}
+    else stt.textContent="⚠️ Belum terkirim. Periksa internet atau login ulang. Kartu tetap tersimpan.";
+  }catch(err){stt.textContent="⚠️ Gagal mengirim: "+buPesan(err)+". Kartu tetap tersimpan, coba lagi.";toast("Gagal mengirim: "+buPesan(err))}
+  b.disabled=false;b.textContent=old;
+};
+$("#savePng").onclick=()=>{try{const a=document.createElement("a");a.href=cv.toDataURL("image/png");a.download="kartu-"+(kc+1)+".png";document.body.appendChild(a);a.click();a.remove()}catch(e){toast("Tidak bisa menyimpan gambar")}};
 
 /* Galeri digital */
 const pl=[];
@@ -629,7 +787,7 @@ async function sha(x){const t="pf|"+x;try{if(window.crypto&&crypto.subtle){const
 let fails=0,lockUntil=0;
 function blocked(el){const w=lockUntil-Date.now();if(w>0){el.textContent="Terlalu banyak percobaan. Coba lagi dalam "+Math.ceil(w/1000)+" detik.";return true}return false}
 function wrong(el){if(++fails>=5){fails=0;lockUntil=Date.now()+30000;el.textContent="Sandi salah 5 kali. Dikunci 30 detik."}else el.textContent="Sandi salah."}
-function saveNow(){if(!user)return;data.notes=$("#notes").value;try{data.board=cv.toDataURL("image/jpeg",.7)}catch(e){}const ok=S.set(ukey(user),data);setSaved(ok?"Tersimpan "+new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}):"Penyimpanan penuh/tidak tersedia")}
+function saveNow(){if(!user)return;data.notes=$("#notes").value;try{cardsStore()}catch(e){}const ok=S.set(ukey(user),data);setSaved(ok?"Tersimpan "+new Date().toLocaleTimeString("id-ID",{hour:"2-digit",minute:"2-digit"}):"Penyimpanan penuh/tidak tersedia")}
 function queueSave(){clearTimeout(st);st=setTimeout(saveNow,700)}
 $("#notes").addEventListener("input",queueSave);
 cv.addEventListener("pointerup",queueSave);
@@ -1017,10 +1175,10 @@ function buJpeg(src){
     if(typeof src==="string")im.src=src;else{u=URL.createObjectURL(src);im.src=u}
   });
 }
-async function buUnggah(src,label){
+async function buUnggah(src,label,ketOverride){
   if(!user){toast("Login dulu.");return false}
   if(!buOK()){toast("Unggah butuh sambungan server. Periksa internet lalu login ulang.");return false}
-  const p={mime:"image/jpeg",b64:await buJpeg(src),ket:(($("#buKet").value||"").trim()||label||"")};
+  const p={mime:"image/jpeg",b64:await buJpeg(src),ket:(ketOverride!=null?String(ketOverride):(($("#buKet").value||"").trim()||label||""))};
   if(user.role==="guru")p.rombel=user.rombel;
   try{await cloudCall("bukti_up",p)}
   catch(e){if(String(e.message)==="sibuk"){await new Promise(r=>setTimeout(r,1500));await cloudCall("bukti_up",p)}else throw e}
@@ -1164,8 +1322,9 @@ function loadData(){
   data=Object.assign({notes:"",board:"",lab:-1},S.get(ukey(user))||{});
   $("#notes").value=data.notes;fill();
   if(data.board){const im=new Image();im.onload=()=>ctx.drawImage(im,0,0,cv.width,cv.height);im.src=data.board}
+  cardsLoad();
   if(data.lab>=0)openLab(data.lab,true);else{$("#labFrame").innerHTML="<span>🔬 Bingkai lab virtual akan tampil di sini.</span>";$("#labTitle").textContent="Pilih salah satu lab di atas";$("#labNew").hidden=true}
-  setSaved(data.notes||data.board?"Progres dipulihkan":"Auto-Save aktif");
+  setSaved(data.notes||data.board||data.cards?"Progres dipulihkan":"Auto-Save aktif");
   renderRombel();discOpen(user.rombel);rfOpen(user.rombel);abOpen(user.rombel);fbOpen(user.rombel);buLoad();
   if(AUTH&&user.role==="guru")cloudRoster(user.rombel);
 }

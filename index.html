@@ -85,6 +85,9 @@ dialog::backdrop{background:rgba(0,0,0,.7)}
 @media(prefers-reduced-motion:reduce){#cover::before{animation:none}}
 .cv-in{position:relative;z-index:1;width:100%;max-width:500px;margin:auto;padding:clamp(14px,3vh,26px) clamp(16px,4vw,30px);border-radius:16px;background:rgba(15,23,42,.62);border:1px solid rgba(165,180,252,.25);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:0 0 60px rgba(99,102,241,.3),0 14px 40px rgba(0,0,0,.5)}
 .cv-in h1{color:#fff;font-size:clamp(1.05rem,4.4vw,1.35rem);text-transform:uppercase;line-height:1.3;margin:0 0 6px}
+.cv-in h1.nx{font-size:clamp(1.7rem,8vw,2.3rem);letter-spacing:3px;margin:0 0 4px}
+.nxsub{font-size:clamp(.72rem,2.9vw,.8rem);line-height:1.35;color:#a5b4d4;margin:0 0 10px}
+.nxttl{font-size:clamp(.9rem,3.8vw,1.05rem);font-weight:800;letter-spacing:1.5px;color:#c7d2fe;margin:0 0 14px}
 .pillars{font-size:.85rem;font-weight:700;color:#a5b4d4;margin:0 0 12px;letter-spacing:.3px}
 .pillars i{font-style:italic}
 .pwrap{width:fit-content;margin:0 auto 12px}
@@ -178,10 +181,10 @@ footer{text-align:center;color:var(--mut);font-size:.85rem;padding:28px 16px 36p
 </head>
 <body>
 <div id="cover"><div class="cv-in">
-  <h1>BELAJAR BERMAKNA MELALUI PORTAL GURU FISIKA</h1>
-  <p class="pillars">✦ <i style="color:#fcd34d">Joyful Learning</i> • <i style="color:#7dd3fc">Mindful Learning</i> • <i style="color:#86efac">Meaningful Learning</i> ✦</p>
+  <h1 class="nx">NEXUS-CLE</h1>
+  <p class="nxsub">(Networked Experience for Understanding Science - Curated Learning Experience)</p>
+  <p class="nxttl">PORTAL PEMBELAJARAN FISIKA</p>
   <div class="pwrap"><div class="photo" id="photoBox" role="img" aria-label="Logo FZ">FZ</div></div>
-  <p class="fine"><b>NEXUS - CLE</b> : Serverless Activity - Based LMS &amp; Content Curator Platform</p>
   <div id="cvResume" hidden><p id="cvWho" style="margin:0 0 12px;color:#e0e7ff"></p><div class="row" style="justify-content:center;margin:0 0 4px"><button class="btn" id="cvGo" type="button">▶ Lanjut ke Portal</button><button class="btn warn" id="cvOut" type="button">🚪 Logout</button></div></div>
   <div class="login">
     <div class="row2"><label class="sel">Tingkat<select class="in" id="cTingkat"></select></label><label class="sel">Nomor Rombel<select class="in" id="cNomor"></select></label></div>
@@ -357,8 +360,21 @@ footer{text-align:center;color:var(--mut);font-size:.85rem;padding:28px 16px 36p
         <input type="text" id="vUrl" placeholder="Tautan YouTube (youtube.com / youtu.be)" aria-label="Tautan video">
         <button class="btn" id="vPlay" type="button">Putar</button>
         <label class="btn alt">📁 Berkas Video<input type="file" id="vFile" accept="video/*" hidden></label>
+        <button class="btn alt" id="recOpen" type="button">🎥 Rekam Kamera</button>
       </div>
       <p class="sub" style="font-size:.85rem;margin:0" id="vNote">Video yang sudah diputar masuk ke daftar putar di bawah.</p>
+      <div id="recBox" hidden style="margin:10px 0;padding:10px;border:1px solid var(--line,#2a3352);border-radius:10px">
+        <video id="recPrev" muted playsinline style="width:100%;max-height:260px;border-radius:8px;background:#000"></video>
+        <div class="row" style="margin-bottom:0">
+          <button class="btn" id="recStart" type="button">⏺ Mulai Rekam</button>
+          <button class="btn warn" id="recStop" type="button" disabled>⏹ Berhenti</button>
+          <button class="btn alt" id="recFlip" type="button">🔄 Balik Kamera</button>
+          <button class="btn alt" id="recClose" type="button">✖ Tutup Kamera</button>
+          <b id="recTime" aria-live="polite"></b>
+        </div>
+        <p class="sub" style="font-size:.85rem;margin:6px 0 0" id="recNote">Maksimal 3 menit. Rekaman hanya ada di perangkat ini: klik Unduh, lalu unggah ke YouTube agar bisa dilihat teman. Rekam hanya dengan persetujuan orang yang tampil.</p>
+        <p style="margin:6px 0 0" id="recLink"></p>
+      </div>
       <ul class="pl" id="pl"></ul>
     </div>
     <div class="panel">
@@ -490,6 +506,52 @@ function renderPl(){const ul=$("#pl");ul.innerHTML="";pl.forEach(it=>{const li=d
 function addVid(it){pl.push(it);renderPl();show(it)}
 $("#vPlay").onclick=()=>{const u=$("#vUrl").value.trim(),id=ytId(u);if(!id){toast("Tautan YouTube tidak dikenali");return}addVid({type:"yt",id,link:"https://www.youtube.com/watch?v="+id,title:"Video YouTube "+(pl.length+1)});$("#vUrl").value=""};
 $("#vFile").onchange=e=>{const f=e.target.files[0];if(!f)return;addVid({type:"file",src:URL.createObjectURL(f),title:f.name});e.target.value=""};
+/* Rekam kamera (video demonstrasi eksperimen) */
+const REC_MAX=180;
+let recStream=null,recMr=null,recChunks=[],recTick=null,recFacing="environment",recN=0;
+function recFmt(t){const m=Math.floor(t/60),r=t%60;return m+":"+(r<10?"0":"")+r}
+function recSetUi(on){$("#recStart").disabled=on;$("#recStop").disabled=!on;$("#recFlip").disabled=on;$("#recClose").disabled=on}
+function recRelease(){if(recStream){recStream.getTracks().forEach(t=>t.stop());recStream=null}const v=$("#recPrev");v.srcObject=null}
+async function recCamera(){
+  if(!(navigator.mediaDevices&&navigator.mediaDevices.getUserMedia&&window.MediaRecorder)){toast("Peramban ini belum mendukung perekaman. Gunakan Chrome terbaru.");return false}
+  recRelease();
+  try{recStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:recFacing}},audio:true})}
+  catch(e){
+    const n=e&&e.name;
+    toast(n==="NotAllowedError"?"Izin kamera/mikrofon ditolak. Izinkan lewat ikon gembok di kolom alamat.":n==="NotFoundError"?"Kamera atau mikrofon tidak ditemukan.":"Kamera tidak dapat dibuka ("+(n||"error")+").");
+    return false;
+  }
+  const v=$("#recPrev");v.srcObject=recStream;v.muted=true;v.play().catch(()=>{});
+  return true;
+}
+$("#recOpen").onclick=async()=>{if(await recCamera()){$("#recBox").hidden=false;$("#recTime").textContent="";recSetUi(false);$("#recStop").disabled=true}};
+$("#recFlip").onclick=async()=>{recFacing=recFacing==="environment"?"user":"environment";await recCamera()};
+$("#recClose").onclick=()=>{recRelease();$("#recBox").hidden=true;$("#recTime").textContent=""};
+$("#recStart").onclick=async()=>{
+  if(!recStream&&!(await recCamera()))return;
+  const types=["video/webm;codecs=vp9,opus","video/webm;codecs=vp8,opus","video/webm","video/mp4"];
+  const mime=types.find(t=>window.MediaRecorder.isTypeSupported&&MediaRecorder.isTypeSupported(t))||"";
+  try{recMr=mime?new MediaRecorder(recStream,{mimeType:mime}):new MediaRecorder(recStream)}
+  catch(e){toast("Perekaman tidak dapat dimulai di perangkat ini.");return}
+  recChunks=[];$("#recLink").textContent="";
+  recMr.ondataavailable=e=>{if(e.data&&e.data.size)recChunks.push(e.data)};
+  recMr.onstop=()=>{
+    clearInterval(recTick);recTick=null;recSetUi(false);
+    const type=(recMr&&recMr.mimeType)||mime||"video/webm";
+    const blob=new Blob(recChunks,{type});recChunks=[];recRelease();
+    if(!blob.size){toast("Rekaman kosong. Coba lagi.");return}
+    const url=URL.createObjectURL(blob),ext=/mp4/.test(type)?"mp4":"webm",ts=new Date().toISOString().slice(0,16).replace(/[:T]/g,"-");
+    recN++;addVid({type:"file",src:url,title:"Rekaman eksperimen "+recN});
+    const a=document.createElement("a");a.className="btn acc";a.href=url;a.download="rekaman-eksperimen-"+ts+"."+ext;a.textContent="⬇ Unduh rekaman ("+Math.max(1,Math.round(blob.size/1048576*10)/10)+" MB)";
+    const L=$("#recLink");L.textContent="";L.appendChild(a);
+    toast("Rekaman selesai. Unduh sebelum menutup halaman.");
+  };
+  recMr.start(1000);recT0=Date.now();recSetUi(true);$("#recStop").disabled=false;
+  $("#recTime").textContent="⏺ 0:00";
+  recTick=setInterval(()=>{const t=Math.floor((Date.now()-recT0)/1000);$("#recTime").textContent="⏺ "+recFmt(t)+" / "+recFmt(REC_MAX);if(t>=REC_MAX&&recMr&&recMr.state==="recording")recMr.stop()},500);
+};
+$("#recStop").onclick=()=>{if(recMr&&recMr.state==="recording")recMr.stop()};
+addEventListener("pagehide",()=>{if(recMr&&recMr.state==="recording")try{recMr.stop()}catch(e){}recRelease()});
 
 const works=[{ph:"📊",t:"Infografis Hukum Newton",by:"Kelompok 1"},{ph:"⚡",t:"Poster Rangkaian Listrik",by:"Kelompok 2"}];
 let pending=null;
@@ -1128,6 +1190,27 @@ $("#homeBtn").onclick=showCover;
 $("#cvGo").onclick=()=>{$("#cover").hidden=true;$("#app").hidden=false;window.scrollTo(0,0)};
 $("#cvOut").onclick=()=>$("#logout").click();
 {const ss=S.get("pf:session");if(ss&&ss.name){if(CLOUD_URL&&!(ss.token&&ss.exp>Date.now())){S.del("pf:session")}else{ss.rombel=ss.rombel||"X-01";enter(ss)}}}
+
+/* Cover di layar komputer/laptop: otomatis diperkecil agar muat penuh, tepat di tengah, tanpa gulir */
+(function(){
+  const cv=document.querySelector("#cover"),box=document.querySelector(".cv-in");
+  if(!cv||!box||!window.matchMedia||!matchMedia("(pointer:fine)").matches)return;
+  let busy=false,raf=0;
+  function fit(){
+    if(busy||cv.hidden)return;busy=true;
+    box.style.zoom="1";
+    const cs=getComputedStyle(cv),pad=parseFloat(cs.paddingTop)+parseFloat(cs.paddingBottom);
+    const avail=cv.clientHeight-pad-4,need=box.offsetHeight;
+    const z=need>avail?Math.max(.5,Math.floor(avail/need*100)/100):1;
+    box.style.zoom=z<1?String(z):"";
+    busy=false;
+  }
+  function sched(){cancelAnimationFrame(raf);raf=requestAnimationFrame(fit)}
+  addEventListener("resize",sched);addEventListener("load",sched);
+  new MutationObserver(sched).observe(box,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["hidden","class"]});
+  new MutationObserver(sched).observe(cv,{attributes:true,attributeFilter:["hidden"]});
+  sched();setTimeout(sched,400);
+})();
 </script>
 </body>
 </html>

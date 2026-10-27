@@ -477,7 +477,7 @@ const AIS=[
  ["🤗","Hugging Face Chat","https://huggingface.co/chat/"],
  ["🪟","Microsoft Copilot","https://copilot.microsoft.com/"]
 ];
-const QUIZ=[["🎮","Quizizz","https://quizizz.com/"],["📋","Google Forms (Belajar.id)","https://forms.google.com/"],["🧩","Wordwall","https://wordwall.net/"],["🏆","Kahoot!","https://kahoot.it/"]];
+const QUIZ=[["🎮","Quizizz","https://quizizz.com/"],["📋","Google Forms","https://forms.google.com/"],["🧩","Wordwall","https://wordwall.net/"],["🏆","Kahoot!","https://kahoot.it/"]];
 const $=s=>document.querySelector(s);
 const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const link=(u,t,c="btn")=>`<a class="${c}" href="${u}" target="_blank" rel="noopener noreferrer">${t}</a>`;
@@ -986,7 +986,7 @@ function hsRender(){
     tr.appendChild(td);tb.appendChild(tr);
     if(it.length&&hsOpen.has(nm)){const d=document.createElement("tr");d.className="det";const c=document.createElement("td");c.colSpan=5;[...it].reverse().forEach(m=>c.appendChild(rfCard(m,false)));d.appendChild(c);tb.appendChild(d)}
   });
-  $("#hsStat").textContent=filled+" / 36 murid sudah mengisi · "+rf.list.length+" refleksi · "+(rf.shared?"🌐 mode bersama":"💾 mode lokal");
+  $("#hsStat").textContent=filled+" / 36 murid sudah mengisi · "+rf.list.length+" refleksi · "+(rf.shared?(CLOUD_URL?"☁️ Google Sheets":"🌐 mode bersama"):"💾 mode lokal");
 }
 function rfRender(){if(!user)return;if(user.role==="guru")hsRender();else mineRender()}
 const csvCell=v=>{let t=String(v==null?"":v);if(/^[=+\-@\t\r]/.test(t))t="'"+t;return '"'+t.replace(/"/g,'""')+'"'};
@@ -1055,7 +1055,7 @@ function abRender(){
     tr.append(td,mk("td","",m?m.time:"-"));tb.appendChild(tr);
   });
   $("#abSum").innerHTML=[["Hadir",cnt.Hadir],["Izin",cnt.Izin],["Sakit",cnt.Sakit],["Alpa",cnt.Alpa],["Belum tercatat",cnt.Belum]].map(a=>`<div class="stat">${a[0]}<b>${a[1]}</b></div>`).join("");
-  $("#abStat").textContent=ab.shared?"🌐 mode bersama":"💾 mode lokal (perangkat ini)";
+  $("#abStat").textContent=ab.shared?(CLOUD_URL?"☁️ Google Sheets":"🌐 mode bersama"):"💾 mode lokal (perangkat ini)";
 }
 $("#abDate").addEventListener("change",abRender);
 $("#abDl").onclick=()=>{
@@ -1136,7 +1136,7 @@ function fbRender(){
   $("#fgSum").innerHTML=c("Responden",t.resp+" / 36")+c("Rata-rata kejelasan",t.n?t.avg.toFixed(1)+" / 5":"-")+c("Terlalu lambat",t.lambat)+c("Pas",t.pas)+c("Terlalu cepat",t.cepat)+c("Perlu penjelasan ulang",t.ulang)+c("Sudah cukup",t.cukup)+c("Siap pengayaan",t.tantang);
   const ul=document.createElement("ul");fbTips(t).forEach(x=>ul.appendChild(mk("li","",x)));
   const tp=$("#fgTips");tp.innerHTML="";tp.append(mk("b","","💡 Rekomendasi diferensiasi (otomatis dari data)"),ul);
-  $("#fgStat").textContent=t.n+" masukan · "+(fb.shared?"🌐 mode bersama":"💾 mode lokal (perangkat ini)");
+  $("#fgStat").textContent=t.n+" masukan · "+(fb.shared?(CLOUD_URL?"☁️ Google Sheets":"🌐 mode bersama"):"💾 mode lokal (perangkat ini)");
 }
 $("#fgDl").onclick=()=>{
   if(!fb.list.length){toast("Belum ada umpan balik untuk diunduh");return}

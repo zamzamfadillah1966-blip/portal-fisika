@@ -431,6 +431,7 @@ footer{text-align:center;color:var(--mut);font-size:.85rem;padding:28px 16px 36p
   </div>
   <div class="gal" id="gal" style="margin-top:12px"><p class="empty" id="galEmpty">Belum ada tangkapan. Tekan “Tangkap Tampilan”.</p></div>
   <h3 style="margin:18px 0 6px">✅ Bukti terunggah <span class="badge" id="buBadge"></span></h3>
+  <div id="buDlRow" hidden><div class="row" style="margin:0 0 8px"><button class="btn acc" id="buDl" type="button">📥 Unduh Rekap Bukti &amp; Nilai</button><span class="sub" style="margin:0;font-size:.85rem">Satu berkas CSV untuk rombel aktif, sesuai daftar murid.</span></div></div>
   <div id="buList" class="panel"><p class="empty">Memuat…</p></div>
 </section>
 <section id="umpan" hidden>
@@ -1199,6 +1200,7 @@ function buChip(d){return d.nilai==null
 function buCat(d){return d.catatan?'📝 Catatan guru: '+esc(d.catatan):""}
 function buCount(){
   const g=user&&user.role==="guru",L=bu.list;
+  $("#buDlRow").hidden=!g;
   $("#buBadge").textContent=L.length+" berkas"+(g?" · "+L.filter(x=>x.role!=="guru"&&x.nilai!=null).length+" dinilai":"");
 }
 function buRender(){
@@ -1241,6 +1243,33 @@ document.addEventListener("click",async e=>{
   }catch(err){s.textContent="⚠️ Gagal menyimpan: "+buPesan(err)}
   b.disabled=false;
 });
+
+$("#buDl").onclick=async()=>{
+  if(!user||user.role!=="guru")return;
+  const b=$("#buDl"),r=user.rombel,old=b.textContent;b.disabled=true;b.textContent="Menyiapkan…";
+  try{
+    await buLoad();
+    try{const x=await cloudCall("roster",{rombel:r});if(x&&Array.isArray(x.names))S.set("pf:roster:"+r,x.names)}catch(e){}
+    const names=[...rosterOf(r)],low=n=>String(n||"").trim().toLowerCase(),by=new Map();
+    bu.list.filter(d=>d.role!=="guru").forEach(d=>{const k=low(d.name);if(!by.has(k))by.set(k,[]);by.get(k).push(d)});
+    const ada=new Set(names.map(low));by.forEach((v,k)=>{if(!ada.has(k))names.push(v[0].name+" (tidak ada di daftar rombel)")});
+    const rows=[["Rombel","No","Nama Murid","Jumlah Bukti","Jumlah Kartu","Sudah Dinilai","Rata-rata Nilai","Status","Rincian Bukti (keterangan: nilai)","Tautan Bukti"]];
+    names.forEach((nm,i)=>{
+      const items=(by.get(low(nm))||by.get(low(nm.replace(/ \(tidak ada di daftar rombel\)$/,"")))||[]).slice().sort((a,c)=>a.ts-c.ts);
+      const sc=items.filter(d=>d.nilai!=null),avg=sc.length?Math.round(sc.reduce((t,d)=>t+Number(d.nilai),0)/sc.length*10)/10:"";
+      const kartu=items.filter(d=>String(d.ket||"").indexOf("Kartu")===0).length;
+      const st=!items.length?"Belum mengunggah":(sc.length<items.length?"Ada yang belum dinilai":"Semua dinilai");
+      rows.push([r.replace(/^(X{1,2}I?|XI{1,2})-0?(\d+)$/,"$1.$2"),i+1,nm,items.length,kartu,sc.length,avg,st,
+        items.map(d=>(d.ket||"Foto")+": "+(d.nilai==null?"belum dinilai":d.nilai)).join(" | "),items.map(d=>d.url||"").filter(Boolean).join(" | ")]);
+    });
+    if(rows.length===1){toast("Belum ada murid atau bukti di rombel ini");}
+    else{
+      const d=new Date(),tg=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+      await dlFile("rekap-bukti-nilai-"+r+"-"+tg+".csv",rows.map(x=>x.map(csvCell).join(",")).join("\r\n"));
+    }
+  }catch(err){toast("Gagal menyiapkan rekap: "+buPesan(err))}
+  b.disabled=false;b.textContent=old;
+};
 $("#buPick").onclick=()=>$("#buFile").click();
 $("#buFile").onchange=async e=>{
   const fs=[...e.target.files];e.target.value="";if(!fs.length||bu.busy)return;
@@ -1309,7 +1338,7 @@ function renderRombel(){
   $("#who").textContent=(g?"👨‍🏫 Guru":"🎒 Siswa")+" · "+r;
   $("#rbBadge").textContent="Aktif: "+r;
   $("#rbNote").textContent=g?"Pilih rombel untuk memantau; data tiap rombel terpisah.":"Anda terdaftar di rombel ini.";
-  $("#rbGuru").hidden=!g;$("#nilai").hidden=!g;$("#navNilai").hidden=!g;$("#absen").hidden=!g;$("#navAbs").hidden=!g;$("#fbguru").hidden=!g;$("#navFbG").hidden=!g;$("#umpan").hidden=g;$("#navUmpan").hidden=g;$("#refleksi").hidden=g;$("#navRefl").hidden=g;$("#histori").hidden=!g;$("#navHist").hidden=!g;if(!g)return;nlLoad(r);
+  $("#rbGuru").hidden=!g;$("#buDlRow").hidden=!g;$("#nilai").hidden=!g;$("#navNilai").hidden=!g;$("#absen").hidden=!g;$("#navAbs").hidden=!g;$("#fbguru").hidden=!g;$("#navFbG").hidden=!g;$("#umpan").hidden=g;$("#navUmpan").hidden=g;$("#refleksi").hidden=g;$("#navRefl").hidden=g;$("#histori").hidden=!g;$("#navHist").hidden=!g;if(!g)return;nlLoad(r);
   const L=rosterOf(r);$("#rbCount").textContent=L.length+" / 36 murid";$("#meterBar").style.width=(L.length/36*100)+"%";
   const ol=$("#roster");ol.innerHTML="";
   L.forEach((nm,i)=>{const li=document.createElement("li");li.append(nm);const b=document.createElement("button");b.type="button";b.textContent="✕";b.setAttribute("aria-label","Hapus "+nm);b.onclick=()=>{const a=rosterOf(r),gone=a[i];a.splice(i,1);S.set("pf:roster:"+r,a);if(AUTH&&gone)cloudCall("rosterdel",{rombel:r,name:gone}).catch(()=>{});renderRombel()};li.appendChild(b);ol.appendChild(li)});
